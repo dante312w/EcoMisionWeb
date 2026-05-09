@@ -1,0 +1,259 @@
+/* =============================================
+   EcoMisión – Auth Styles (Login & Register)
+   ============================================= */
+
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&family=Playfair+Display:wght@700&display=swap');
+
+:root {
+  --eco-green:        #4a8c3f;
+  --eco-green-light:  #6db760;
+  --eco-green-pale:   #e8f5e4;
+  --eco-lavender:     #c9bfe8;
+  --eco-lavender-btn: #b8aede;
+  --eco-lavender-dark:#9b8ec4;
+  --eco-white:        #ffffff;
+  --eco-cloud:        #f0f4f8;
+  --eco-text:         #3a3a3a;
+  --eco-text-soft:    #8a9ba8;
+  --eco-shadow:       rgba(74, 140, 63, 0.18);
+}
+
+/* ── Base ─────────────────────────────────── */
+.auth-page {
+  font-family: 'Nunito', sans-serif;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(170deg, #eaf4e6 0%, #f5f0ff 50%, #dff0e8 100%);
+  position: relative;
+  overflow: hidden;
+  padding: 2rem 1rem;
+}
+
+/* ── Decorative blobs ─────────────────────── */
+.auth-page::before,
+.auth-page::after {
+  content: '';
+  position: fixed;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
+}
+.auth-page::before {
+  width: 520px; height: 520px;
+  background: radial-gradient(circle, rgba(180,230,160,0.35) 0%, transparent 70%);
+  top: -180px; left: -180px;
+}
+.auth-page::after {
+  width: 420px; height: 420px;
+  background: radial-gradient(circle, rgba(190,180,240,0.28) 0%, transparent 70%);
+  bottom: -160px; right: -160px;
+}
+
+/* floating leaves decoration */
+.leaf-deco {
+  position: fixed;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.12;
+  font-size: 5rem;
+}
+.leaf-deco-1 { bottom: 40px; left: 20px; transform: rotate(-20deg); font-size: 6rem; opacity: 0.15; }
+.leaf-deco-2 { top: 60px;    right: 30px; transform: rotate(30deg);  font-size: 4rem; }
+
+/* ── Card ─────────────────────────────────── */
+.auth-card {
+  position: relative;
+  z-index: 1;
+  background: rgba(255, 255, 255, 0.82);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255,255,255,0.6);
+  border-radius: 28px;
+  padding: 2.8rem 2.4rem;
+  width: 100%;
+  max-width: 430px;
+  box-shadow: 0 8px 40px var(--eco-shadow), 0 2px 12px rgba(0,0,0,0.06);
+  animation: cardIn 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes cardIn {
+  from { opacity: 0; transform: translateY(30px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0)    scale(1);    }
+}
+
+/* ── Logo / Brand ─────────────────────────── */
+.auth-logo {
+  text-align: center;
+  margin-bottom: 1.6rem;
+}
+.auth-logo-icon {
+  width: 80px; height: 80px;
+  background: linear-gradient(135deg, var(--eco-green-pale) 0%, #d6f0cf 100%);
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0.75rem;
+  box-shadow: 0 4px 16px rgba(74,140,63,0.2);
+  font-size: 2.4rem;
+  animation: pulse-logo 3s ease-in-out infinite;
+}
+@keyframes pulse-logo {
+  0%,100% { transform: scale(1); }
+  50%      { transform: scale(1.05); }
+}
+.auth-logo-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--eco-green);
+  margin: 0;
+  letter-spacing: -0.5px;
+}
+.auth-logo-subtitle {
+  font-size: 0.85rem;
+  color: var(--eco-text-soft);
+  margin-top: 0.2rem;
+}
+
+/* ── Page heading (inside card, no logo) ─── */
+.auth-heading {
+  font-family: 'Nunito', sans-serif;
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--eco-green);
+  text-align: center;
+  margin-bottom: 0.3rem;
+}
+.auth-subheading {
+  font-size: 0.85rem;
+  color: var(--eco-text-soft);
+  text-align: center;
+  margin-bottom: 1.8rem;
+}
+
+/* ── Form inputs ──────────────────────────── */
+.auth-input-group {
+  position: relative;
+  margin-bottom: 1.1rem;
+}
+.auth-input-group .input-icon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--eco-text-soft);
+  font-size: 1rem;
+  pointer-events: none;
+}
+.auth-input {
+  width: 100%;
+  border: 1.5px solid #d8e8d4;
+  border-radius: 14px;
+  padding: 0.78rem 1rem 0.78rem 2.6rem;
+  font-family: 'Nunito', sans-serif;
+  font-size: 0.95rem;
+  color: var(--eco-text);
+  background: rgba(255,255,255,0.75);
+  transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+  outline: none;
+}
+.auth-input::placeholder { color: var(--eco-text-soft); }
+.auth-input:focus {
+  border-color: var(--eco-green-light);
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(109,183,96,0.15);
+}
+
+/* ── Buttons ──────────────────────────────── */
+.btn-eco-primary {
+  display: block;
+  width: 100%;
+  padding: 0.85rem;
+  border: none;
+  border-radius: 50px;
+  background: linear-gradient(135deg, var(--eco-green) 0%, var(--eco-green-light) 100%);
+  color: #fff;
+  font-family: 'Nunito', sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  letter-spacing: 0.3px;
+  transition: transform 0.18s, box-shadow 0.18s, filter 0.18s;
+  box-shadow: 0 4px 16px rgba(74,140,63,0.35);
+  margin-top: 0.5rem;
+}
+.btn-eco-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 22px rgba(74,140,63,0.45);
+  filter: brightness(1.06);
+}
+.btn-eco-primary:active { transform: translateY(0); }
+
+.btn-eco-secondary {
+  display: block;
+  width: 100%;
+  padding: 0.82rem;
+  border: none;
+  border-radius: 50px;
+  background: linear-gradient(135deg, var(--eco-lavender) 0%, var(--eco-lavender-dark) 100%);
+  color: #fff;
+  font-family: 'Nunito', sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.18s, box-shadow 0.18s, filter 0.18s;
+  box-shadow: 0 4px 16px rgba(155,142,196,0.3);
+  text-decoration: none;
+  text-align: center;
+  margin-top: 0.5rem;
+}
+.btn-eco-secondary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 22px rgba(155,142,196,0.4);
+  filter: brightness(1.06);
+  color: #fff;
+}
+
+/* ── Footer link ──────────────────────────── */
+.auth-footer-link {
+  text-align: center;
+  margin-top: 1.4rem;
+  font-size: 0.88rem;
+  color: var(--eco-text-soft);
+}
+.auth-footer-link a {
+  color: var(--eco-green);
+  font-weight: 700;
+  text-decoration: none;
+  transition: color 0.15s;
+}
+.auth-footer-link a:hover { color: var(--eco-green-light); }
+
+/* ── Divider ──────────────────────────────── */
+.auth-divider {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 1.2rem 0;
+  color: var(--eco-text-soft);
+  font-size: 0.8rem;
+}
+.auth-divider::before,
+.auth-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: #d8e8d4;
+}
+
+/* ── Welcome screen (landing) ─────────────── */
+.welcome-buttons { margin-top: 2rem; display: flex; flex-direction: column; gap: 0.8rem; }
+
+/* ── Responsive ───────────────────────────── */
+@media (max-width: 480px) {
+  .auth-card { padding: 2rem 1.4rem; border-radius: 22px; }
+  .auth-logo-title { font-size: 1.7rem; }
+}
