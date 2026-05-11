@@ -257,3 +257,54 @@
   .auth-card { padding: 2rem 1.4rem; border-radius: 22px; }
   .auth-logo-title { font-size: 1.7rem; }
 }
+
+/* ── Bootstrap overrides / custom classes ───────────────────────────────────
+   Se usan junto a las clases Bootstrap (btn, form-control, form-floating…)
+   para mantener la paleta EcoMisión sin romper el comportamiento de BS.
+   ────────────────────────────────────────────────────────────────────────── */
+
+/* Botón principal verde — úsalo como: className="btn btn-eco w-100" */
+.btn-eco {
+  background: linear-gradient(135deg, var(--eco-green) 0%, var(--eco-green-light) 100%);
+  color: #fff;
+  border: none;
+  border-radius: 50px;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 700;
+  font-size: 1rem;
+  letter-spacing: 0.2px;
+  box-shadow: 0 4px 16px rgba(74,140,63,0.32);
+  transition: transform 0.18s, box-shadow 0.18s, filter 0.18s;
+}
+.btn-eco:hover, .btn-eco:focus {
+  color: #fff;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 22px rgba(74,140,63,0.42);
+  filter: brightness(1.06);
+}
+.btn-eco:disabled {
+  background: #c5d9c0;
+  box-shadow: none;
+  transform: none;
+  filter: none;
+}
+
+/* Links verdes — úsalo como: className="eco-link" */
+.eco-link {
+  color: var(--eco-green);
+  text-decoration: none;
+  transition: color 0.15s;
+}
+.eco-link:hover { color: var(--eco-green-light); }
+
+/* form-control focus en verde */
+.form-control:focus {
+  border-color: var(--eco-green-light);
+  box-shadow: 0 0 0 0.2rem rgba(109,183,96,0.2);
+}
+
+/* form-check-input tick en verde */
+.form-check-input:checked {
+  background-color: var(--eco-green);
+  border-color: var(--eco-green);
+}

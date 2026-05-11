@@ -1,13 +1,12 @@
 // src/pages/Login.jsx
-// Pantalla de inicio de sesión – EcoMisión
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import '../styles/auth.css';
 
 export default function Login() {
   const navigate = useNavigate();
-  const [form, setForm] = useState({ email: '', password: '' });
-  const [error, setError] = useState('');
+  const [form, setForm]       = useState({ email: '', password: '' });
+  const [error, setError]     = useState('');
   const [loading, setLoading] = useState(false);
 
   const handleChange = (e) =>
@@ -16,17 +15,16 @@ export default function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-
     if (!form.email || !form.password) {
       setError('Por favor completa todos los campos.');
       return;
     }
-
     setLoading(true);
-    // TODO: conectar con tu backend / Firebase / Supabase
+    // Reemplazar con llamada real al API
     setTimeout(() => {
       setLoading(false);
-      navigate('/reto'); // redirige a la pantalla principal
+      localStorage.setItem('eco_userEmail', form.email);
+      navigate('/dashboard');
     }, 1200);
   };
 
@@ -36,78 +34,95 @@ export default function Login() {
       <span className="leaf-deco leaf-deco-2">🍃</span>
 
       <div className="auth-card">
-        {/* Mini logo */}
-        <div className="auth-logo" style={{ marginBottom: '1rem' }}>
-          <div className="auth-logo-icon" style={{ width: 60, height: 60, fontSize: '1.8rem' }}>
-            🌍
-          </div>
-          <h1 className="auth-logo-title" style={{ fontSize: '1.6rem' }}>EcoMisión</h1>
+
+        {/* Logo */}
+        <div className="text-center mb-4">
+          <div className="auth-logo-icon mx-auto mb-2">🌍</div>
+          <h1 className="auth-logo-title">EcoMisión</h1>
+          <p className="text-muted small">Inicia sesión para continuar tu misión</p>
         </div>
 
-        <h2 className="auth-heading">Bienvenido de vuelta 👋</h2>
-        <p className="auth-subheading">Inicia sesión para continuar tu misión</p>
-
+        {/* Bootstrap alert */}
         {error && (
-          <div
-            className="alert alert-danger py-2 px-3 rounded-3 mb-3"
-            style={{ fontSize: '0.85rem', background: '#fdecea', color: '#c0392b', border: 'none' }}
-          >
+          <div className="alert alert-danger py-2 px-3 rounded-3 small" role="alert">
             {error}
           </div>
         )}
 
+        {/* Bootstrap Sign In form */}
         <form onSubmit={handleSubmit} noValidate>
-          {/* Email */}
-          <div className="auth-input-group">
-            <span className="input-icon">✉️</span>
+
+          {/* form-floating — patrón oficial Bootstrap Sign In */}
+          <div className="form-floating mb-3">
             <input
-              className="auth-input"
               type="email"
+              className="form-control"
+              id="floatingEmail"
               name="email"
-              placeholder="Correo electrónico"
+              placeholder="nombre@ejemplo.com"
               value={form.email}
               onChange={handleChange}
               autoComplete="email"
+              required
             />
+            <label htmlFor="floatingEmail">✉️ Correo electrónico</label>
           </div>
 
-          {/* Password */}
-          <div className="auth-input-group">
-            <span className="input-icon">🔒</span>
+          <div className="form-floating mb-3">
             <input
-              className="auth-input"
               type="password"
+              className="form-control"
+              id="floatingPassword"
               name="password"
               placeholder="Contraseña"
               value={form.password}
               onChange={handleChange}
               autoComplete="current-password"
+              required
             />
+            <label htmlFor="floatingPassword">🔒 Contraseña</label>
           </div>
 
-          {/* Forgot password */}
-          <div style={{ textAlign: 'right', marginBottom: '0.3rem' }}>
-            <a
-              href="#"
-              style={{ fontSize: '0.82rem', color: 'var(--eco-green)', textDecoration: 'none', fontWeight: 600 }}
-            >
-              ¿Olvidaste tu contraseña?
-            </a>
+          {/* Checkbox + link — patrón Bootstrap */}
+          <div className="d-flex justify-content-between align-items-center mb-3">
+            <div className="form-check">
+              <input className="form-check-input" type="checkbox" id="rememberMe" />
+              <label className="form-check-label small text-muted" htmlFor="rememberMe">
+                Recordarme
+              </label>
+            </div>
+            <a href="#" className="small eco-link">¿Olvidaste tu contraseña?</a>
           </div>
 
+          {/* Botón con spinner Bootstrap */}
           <button
-            className="btn-eco-primary"
+            className="btn btn-eco w-100 py-2"
             type="submit"
             disabled={loading}
           >
-            {loading ? '🌱 Entrando…' : 'Iniciar sesión'}
+            {loading ? (
+              <>
+                <span
+                  className="spinner-border spinner-border-sm me-2"
+                  role="status"
+                  aria-hidden="true"
+                />
+                Entrando…
+              </>
+            ) : (
+              'Iniciar sesión 🌱'
+            )}
           </button>
+
         </form>
 
-        <div className="auth-footer-link">
+        <hr className="my-3" />
+
+        <p className="text-center small text-muted mb-0">
           ¿No tienes cuenta?{' '}
-          <Link to="/register">Regístrate aquí</Link>
-        </div>
+          <Link to="/register" className="eco-link fw-bold">Regístrate aquí</Link>
+        </p>
+
       </div>
     </div>
   );

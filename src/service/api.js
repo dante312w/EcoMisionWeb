@@ -1,6 +1,6 @@
 // src/services/api.js
 // Capa de comunicación con tu REST API – EcoMisión
-// Ajusta BASE_URL a la URL de tu backend
+// Ajusta BASE_URL a la URL del backend
 
 const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
 

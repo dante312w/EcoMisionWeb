@@ -61,13 +61,13 @@ export default function Cuestionario() {
       // Guarda localmente como respaldo
       localStorage.setItem('eco_huella', huellaKg);
 
-      navigate('/reto');
+      navigate('/dashboard');
     } catch (err) {
       console.error(err);
       // Si el backend falla, guarda local y sigue de todas formas
       const huellaKg = calcularHuella(respuestas);
       localStorage.setItem('eco_huella', huellaKg);
-      navigate('/reto');
+      navigate('/dashboard');
     } finally {
       setEnviando(false);
     }

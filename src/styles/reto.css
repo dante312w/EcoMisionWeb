@@ -1,0 +1,297 @@
+/* src/styles/reto.css */
+
+/* ── Variables ── */
+:root {
+  --eco-green:      #2d7a3a;
+  --eco-green-mid:  #3a9e4f;
+  --eco-green-light:#e8f5ea;
+  --eco-green-pale: #f2faf3;
+  --eco-easy:       #27ae60;
+  --eco-mid:        #e67e22;
+  --eco-hard:       #e74c3c;
+  --eco-text:       #1a2e1c;
+  --eco-muted:      #6c8f72;
+  --eco-border:     #c8e6cc;
+  --eco-card-bg:    #ffffff;
+  --eco-nav-bg:     #ffffff;
+  --eco-shadow:     0 4px 24px rgba(45,122,58,0.10);
+  --eco-shadow-lg:  0 8px 40px rgba(45,122,58,0.15);
+  --nav-h:          68px;
+  --header-h:       90px;
+}
+
+/* ── Page shell ── */
+.reto-page {
+  min-height: 100dvh;
+  background: linear-gradient(160deg, #e8f5ea 0%, #f9fdf9 55%, #d4edda 100%);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow-x: hidden;
+  font-family: 'Segoe UI', system-ui, sans-serif;
+}
+
+/* ── Leaf decorations (reuses auth pattern) ── */
+.leaf-deco {
+  position: fixed;
+  font-size: 4rem;
+  opacity: 0.08;
+  pointer-events: none;
+  user-select: none;
+  z-index: 0;
+}
+.leaf-deco-1 { top: -1rem;  left: -1.5rem; transform: rotate(-20deg); font-size: 6rem; }
+.leaf-deco-2 { bottom: 80px; right: -1rem; transform: rotate(15deg);  font-size: 5rem; }
+
+/* ── Header ── */
+.reto-header {
+  height: var(--header-h);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding-top: 1rem;
+  z-index: 1;
+}
+.reto-header-inner {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+}
+.reto-subtitle {
+  font-size: .8rem;
+  color: var(--eco-muted);
+  margin: .15rem 0 0;
+  letter-spacing: .3px;
+}
+
+/* ── Main scroll area ── */
+.reto-main {
+  flex: 1;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 1rem 1rem calc(var(--nav-h) + 1.5rem);
+  z-index: 1;
+}
+
+/* ── Reto card ── */
+.reto-card {
+  background: var(--eco-card-bg);
+  border-radius: 24px;
+  padding: 1.6rem 1.5rem 1.4rem;
+  box-shadow: var(--eco-shadow-lg);
+  border: 1.5px solid var(--eco-border);
+  width: 100%;
+  max-width: 440px;
+  transition: opacity .25s ease, transform .25s ease;
+}
+.reto-card--swap {
+  opacity: 0;
+  transform: translateY(12px) scale(.98);
+}
+.reto-card--done {
+  border-color: var(--eco-green-mid);
+}
+
+/* ── Categoría badge ── */
+.reto-categoria-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: .4rem;
+  background: var(--eco-green-light);
+  color: var(--eco-green);
+  font-size: .78rem;
+  font-weight: 600;
+  padding: .28rem .75rem;
+  border-radius: 99px;
+  letter-spacing: .3px;
+  margin-bottom: .75rem;
+}
+.reto-cat-icon { font-size: 1rem; }
+
+/* ── Dificultad ── */
+.reto-dificultad {
+  display: flex;
+  align-items: center;
+  gap: .35rem;
+  font-size: .82rem;
+  font-weight: 600;
+  margin-bottom: .6rem;
+}
+.reto-stars { letter-spacing: 1px; }
+.reto-dif-label { }
+.reto-puntos { color: var(--eco-muted); font-weight: 500; }
+
+/* ── Título ── */
+.reto-titulo {
+  font-size: 1.55rem;
+  font-weight: 800;
+  color: var(--eco-text);
+  line-height: 1.2;
+  margin-bottom: .65rem;
+  letter-spacing: -.3px;
+}
+
+/* ── Descripción ── */
+.reto-descripcion {
+  font-size: .93rem;
+  color: #4a6a4e;
+  line-height: 1.55;
+  margin-bottom: 1.1rem;
+}
+
+/* ── Huella card ── */
+.reto-huella-card {
+  display: flex;
+  align-items: center;
+  gap: .85rem;
+  background: var(--eco-green-pale);
+  border: 1.5px solid var(--eco-border);
+  border-radius: 14px;
+  padding: .85rem 1rem;
+  margin-bottom: 1.2rem;
+}
+.reto-huella-icon { font-size: 1.8rem; line-height: 1; }
+.reto-huella-valor {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--eco-green);
+  margin: 0;
+  letter-spacing: -.3px;
+}
+.reto-huella-label {
+  font-size: .75rem;
+  color: var(--eco-muted);
+  margin: .1rem 0 0;
+}
+
+/* ── Done banner ── */
+.reto-done-banner {
+  background: #d4edda;
+  border: 1.5px solid #a3d4a8;
+  color: #1e5628;
+  border-radius: 12px;
+  padding: .65rem 1rem;
+  font-size: .88rem;
+  font-weight: 600;
+  text-align: center;
+  margin-bottom: 1rem;
+  animation: fadeInUp .4s ease;
+}
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Botones ── */
+.btn-eco {
+  background: linear-gradient(135deg, var(--eco-green) 0%, var(--eco-green-mid) 100%);
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: .95rem;
+  letter-spacing: .2px;
+  transition: opacity .2s, transform .15s;
+}
+.btn-eco:hover:not(:disabled)  { opacity: .9; transform: translateY(-1px); color: #fff; }
+.btn-eco:active:not(:disabled) { transform: translateY(0); }
+.btn-eco:disabled              { opacity: .65; cursor: not-allowed; }
+
+.reto-btn-completar { border-radius: 12px; }
+
+.reto-btn-sustituir {
+  background: transparent;
+  border: 1.5px solid var(--eco-border);
+  color: var(--eco-green);
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: .92rem;
+  transition: background .2s, border-color .2s;
+}
+.reto-btn-sustituir:hover:not(:disabled) {
+  background: var(--eco-green-light);
+  border-color: var(--eco-green-mid);
+}
+.reto-btn-sustituir:disabled { opacity: .55; cursor: not-allowed; }
+
+/* ── Skeleton loader ── */
+.reto-skeleton {
+  background: var(--eco-card-bg);
+  border-radius: 24px;
+  padding: 1.6rem 1.5rem;
+  box-shadow: var(--eco-shadow);
+  border: 1.5px solid var(--eco-border);
+  width: 100%;
+  max-width: 440px;
+  animation: pulse 1.4s ease-in-out infinite;
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: .5; }
+}
+.skeleton-badge,
+.skeleton-title,
+.skeleton-line,
+.skeleton-pill {
+  background: var(--eco-green-light);
+  border-radius: 99px;
+  margin-bottom: .9rem;
+}
+.skeleton-badge { width: 90px;  height: 26px; }
+.skeleton-title { width: 75%;   height: 36px; border-radius: 10px; }
+.skeleton-line  { width: 100%;  height: 14px; }
+.skeleton-line.short { width: 60%; }
+.skeleton-pill  { width: 100%;  height: 72px; border-radius: 14px; margin-top: .5rem; }
+
+/* ── Bottom nav ── */
+.reto-bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: var(--nav-h);
+  background: var(--eco-nav-bg);
+  border-top: 1.5px solid var(--eco-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  z-index: 100;
+  padding-bottom: env(safe-area-inset-bottom, 0);
+  box-shadow: 0 -4px 20px rgba(45,122,58,0.07);
+}
+.reto-nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: .18rem;
+  color: var(--eco-muted);
+  text-decoration: none;
+  font-size: .7rem;
+  font-weight: 600;
+  letter-spacing: .3px;
+  padding: .4rem .8rem;
+  border-radius: 12px;
+  transition: color .2s, background .2s;
+  min-width: 64px;
+}
+.reto-nav-item:hover {
+  color: var(--eco-green);
+  background: var(--eco-green-light);
+}
+.reto-nav-item--active {
+  color: var(--eco-green);
+}
+.reto-nav-item--active .reto-nav-icon {
+  background: var(--eco-green-light);
+  border-radius: 10px;
+  padding: .3rem .55rem;
+}
+.reto-nav-icon { font-size: 1.3rem; line-height: 1; }
+
+/* ── Responsive tweaks ── */
+@media (min-width: 500px) {
+  .reto-main { padding-top: 1.5rem; }
+  .reto-titulo { font-size: 1.75rem; }
+}

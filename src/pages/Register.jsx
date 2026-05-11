@@ -1,5 +1,5 @@
 // src/pages/Register.jsx
-// Pantalla de creación de cuenta – EcoMisión
+// Crear cuenta con clases Bootstrap + paleta EcoMisión
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import '../styles/auth.css';
@@ -12,7 +12,7 @@ export default function Register() {
     password: '',
     confirmPassword: '',
   });
-  const [error, setError] = useState('');
+  const [error, setError]     = useState('');
   const [loading, setLoading] = useState(false);
 
   const handleChange = (e) =>
@@ -38,10 +38,11 @@ export default function Register() {
     }
 
     setLoading(true);
-    // TODO: conectar con tu backend / Firebase / Supabase
+    // TODO: reemplazar con llamada real a tu REST API
     setTimeout(() => {
       setLoading(false);
-      navigate('/cuestionario'); // redirige al cuestionario inicial
+      localStorage.setItem('eco_userEmail', email);
+      navigate('/cuestionario');
     }, 1400);
   };
 
@@ -51,95 +52,112 @@ export default function Register() {
       <span className="leaf-deco leaf-deco-2">🍃</span>
 
       <div className="auth-card">
-        {/* Mini logo */}
-        <div className="auth-logo" style={{ marginBottom: '0.8rem' }}>
-          <div className="auth-logo-icon" style={{ width: 60, height: 60, fontSize: '1.8rem' }}>
-            🌍
-          </div>
+
+        {/* Logo */}
+        <div className="text-center mb-4">
+          <div className="auth-logo-icon mx-auto mb-2">🌍</div>
+          <h1 className="auth-logo-title">EcoMisión</h1>
+          <p className="text-muted small">Únete a la misión por un planeta mejor</p>
         </div>
 
-        <h2 className="auth-heading">Crear cuenta 🌱</h2>
-        <p className="auth-subheading">Únete a la misión por un planeta mejor</p>
-
+        {/* Bootstrap alert */}
         {error && (
-          <div
-            className="alert py-2 px-3 rounded-3 mb-3"
-            style={{ fontSize: '0.85rem', background: '#fdecea', color: '#c0392b', border: 'none' }}
-          >
+          <div className="alert alert-danger py-2 px-3 rounded-3 small" role="alert">
             {error}
           </div>
         )}
 
+        {/* Bootstrap Register form */}
         <form onSubmit={handleSubmit} noValidate>
-          {/* Name */}
-          <div className="auth-input-group">
-            <span className="input-icon">👤</span>
+
+          <div className="form-floating mb-3">
             <input
-              className="auth-input"
               type="text"
+              className="form-control"
+              id="floatingName"
               name="name"
-              placeholder="Nombre"
+              placeholder="Tu nombre"
               value={form.name}
               onChange={handleChange}
               autoComplete="name"
+              required
             />
+            <label htmlFor="floatingName">👤 Nombre</label>
           </div>
 
-          {/* Email */}
-          <div className="auth-input-group">
-            <span className="input-icon">✉️</span>
+          <div className="form-floating mb-3">
             <input
-              className="auth-input"
               type="email"
+              className="form-control"
+              id="floatingEmail"
               name="email"
-              placeholder="Correo electrónico"
+              placeholder="nombre@ejemplo.com"
               value={form.email}
               onChange={handleChange}
               autoComplete="email"
+              required
             />
+            <label htmlFor="floatingEmail">✉️ Correo electrónico</label>
           </div>
 
-          {/* Password */}
-          <div className="auth-input-group">
-            <span className="input-icon">🔒</span>
+          <div className="form-floating mb-3">
             <input
-              className="auth-input"
               type="password"
+              className="form-control"
+              id="floatingPassword"
               name="password"
               placeholder="Contraseña"
               value={form.password}
               onChange={handleChange}
               autoComplete="new-password"
+              required
             />
+            <label htmlFor="floatingPassword">🔒 Contraseña</label>
           </div>
 
-          {/* Confirm password */}
-          <div className="auth-input-group">
-            <span className="input-icon">🔑</span>
+          <div className="form-floating mb-4">
             <input
-              className="auth-input"
               type="password"
+              className="form-control"
+              id="floatingConfirm"
               name="confirmPassword"
               placeholder="Confirmar contraseña"
               value={form.confirmPassword}
               onChange={handleChange}
               autoComplete="new-password"
+              required
             />
+            <label htmlFor="floatingConfirm">🔑 Confirmar contraseña</label>
           </div>
 
           <button
-            className="btn-eco-primary"
+            className="btn btn-eco w-100 py-2"
             type="submit"
             disabled={loading}
           >
-            {loading ? '🌱 Creando cuenta…' : 'Registrarse'}
+            {loading ? (
+              <>
+                <span
+                  className="spinner-border spinner-border-sm me-2"
+                  role="status"
+                  aria-hidden="true"
+                />
+                Creando cuenta…
+              </>
+            ) : (
+              'Registrarse 🌱'
+            )}
           </button>
+
         </form>
 
-        <div className="auth-footer-link">
+        <hr className="my-3" />
+
+        <p className="text-center small text-muted mb-0">
           ¿Ya tienes cuenta?{' '}
-          <Link to="/login">Iniciar sesión</Link>
-        </div>
+          <Link to="/login" className="eco-link fw-bold">Iniciar sesión</Link>
+        </p>
+
       </div>
     </div>
   );
