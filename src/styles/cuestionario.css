@@ -1,0 +1,274 @@
+/* =============================================
+   EcoMisión – Cuestionario Styles
+   ============================================= */
+
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&family=Playfair+Display:wght@700&display=swap');
+
+/* ── Page wrapper ─────────────────────────── */
+.cuest-page {
+  font-family: 'Nunito', sans-serif;
+  min-height: 100vh;
+  background: linear-gradient(170deg, #eaf4e6 0%, #f5f0ff 50%, #dff0e8 100%);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 2rem 1rem 3rem;
+  position: relative;
+  overflow-x: hidden;
+}
+
+.cuest-page::before {
+  content: '';
+  position: fixed;
+  width: 480px; height: 480px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(180,230,160,0.3) 0%, transparent 70%);
+  top: -160px; left: -160px;
+  pointer-events: none;
+  z-index: 0;
+}
+.cuest-page::after {
+  content: '';
+  position: fixed;
+  width: 380px; height: 380px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(190,180,240,0.22) 0%, transparent 70%);
+  bottom: -140px; right: -140px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Reusar leaf-deco de auth.css */
+.leaf-deco { position: fixed; pointer-events: none; z-index: 0; opacity: 0.12; font-size: 5rem; }
+.leaf-deco-1 { bottom: 40px; left: 20px; transform: rotate(-20deg); font-size: 6rem; opacity: 0.15; }
+.leaf-deco-2 { top: 60px;    right: 30px; transform: rotate(30deg);  font-size: 4rem; }
+
+/* ── Card ─────────────────────────────────── */
+.cuest-card {
+  position: relative;
+  z-index: 1;
+  background: rgba(255,255,255,0.84);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255,255,255,0.6);
+  border-radius: 28px;
+  padding: 2.4rem 2.2rem;
+  width: 100%;
+  max-width: 520px;
+  box-shadow: 0 8px 40px rgba(74,140,63,0.14), 0 2px 12px rgba(0,0,0,0.06);
+  animation: cardIn 0.5s cubic-bezier(0.22,1,0.36,1) both;
+}
+@keyframes cardIn {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+
+/* ── Header ───────────────────────────────── */
+.cuest-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.4rem;
+}
+.cuest-emoji {
+  font-size: 2.6rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+.cuest-title {
+  font-family: 'Nunito', sans-serif;
+  font-size: 1.45rem;
+  font-weight: 800;
+  color: #4a8c3f;
+  margin: 0 0 0.15rem;
+}
+.cuest-subtitle {
+  font-size: 0.85rem;
+  color: #8a9ba8;
+  margin: 0;
+}
+
+/* ── Progress ─────────────────────────────── */
+.cuest-progress-wrap { margin-bottom: 1.8rem; }
+
+.cuest-progress-labels {
+  display: flex;
+  gap: 0.6rem;
+  margin-bottom: 0.5rem;
+}
+.cuest-step-dot {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  background: #e8f5e4;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  color: #aac8a4;
+  font-weight: 700;
+  transition: background 0.25s, color 0.25s, transform 0.2s;
+}
+.cuest-step-dot.done {
+  background: #4a8c3f;
+  color: #fff;
+}
+.cuest-step-dot.active {
+  background: #6db760;
+  color: #fff;
+  transform: scale(1.15);
+  box-shadow: 0 2px 10px rgba(74,140,63,0.3);
+}
+
+.cuest-progress-bar {
+  height: 6px;
+  background: #d8ead4;
+  border-radius: 99px;
+  overflow: hidden;
+  margin-bottom: 0.4rem;
+}
+.cuest-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #4a8c3f, #6db760);
+  border-radius: 99px;
+  transition: width 0.4s cubic-bezier(0.22,1,0.36,1);
+}
+.cuest-progress-text {
+  font-size: 0.78rem;
+  color: #8a9ba8;
+  margin: 0;
+}
+
+/* ── Preguntas ────────────────────────────── */
+.cuest-preguntas {
+  display: flex;
+  flex-direction: column;
+  gap: 1.6rem;
+  animation: fadeSlide 0.35s ease both;
+}
+@keyframes fadeSlide {
+  from { opacity: 0; transform: translateX(18px); }
+  to   { opacity: 1; transform: translateX(0);    }
+}
+
+.cuest-pregunta {}
+.cuest-pregunta-texto {
+  font-size: 0.97rem;
+  font-weight: 700;
+  color: #3a3a3a;
+  margin-bottom: 0.75rem;
+  line-height: 1.4;
+}
+.cuest-pregunta-num {
+  color: #6db760;
+  font-weight: 800;
+}
+
+/* ── Opciones ─────────────────────────────── */
+.cuest-opciones {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.cuest-opcion {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.65rem 1rem;
+  border: 1.5px solid #d8ead4;
+  border-radius: 14px;
+  background: rgba(255,255,255,0.7);
+  font-family: 'Nunito', sans-serif;
+  font-size: 0.9rem;
+  color: #3a3a3a;
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 0.18s, background 0.18s, transform 0.15s, box-shadow 0.18s;
+  width: 100%;
+}
+.cuest-opcion:hover {
+  border-color: #6db760;
+  background: #f0fae8;
+  transform: translateX(3px);
+}
+.cuest-opcion.seleccionada {
+  border-color: #4a8c3f;
+  background: linear-gradient(135deg, #e8f5e4, #f0fae8);
+  box-shadow: 0 2px 12px rgba(74,140,63,0.18);
+  font-weight: 700;
+}
+.cuest-radio { font-size: 1rem; flex-shrink: 0; }
+
+/* ── Error / aviso ────────────────────────── */
+.cuest-error {
+  color: #c0392b;
+  font-size: 0.83rem;
+  background: #fdecea;
+  border-radius: 10px;
+  padding: 0.5rem 0.9rem;
+  margin-top: 0.8rem;
+}
+.cuest-aviso {
+  text-align: center;
+  font-size: 0.8rem;
+  color: #aab8c2;
+  margin-top: 0.5rem;
+  margin-bottom: 0;
+}
+
+/* ── Navegación ───────────────────────────── */
+.cuest-nav {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1.8rem;
+  justify-content: flex-end;
+}
+
+.btn-cuest-back {
+  padding: 0.75rem 1.4rem;
+  border: 1.5px solid #d8ead4;
+  border-radius: 50px;
+  background: transparent;
+  color: #4a8c3f;
+  font-family: 'Nunito', sans-serif;
+  font-size: 0.93rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.18s, border-color 0.18s;
+}
+.btn-cuest-back:hover { background: #f0fae8; border-color: #6db760; }
+
+.btn-cuest-next,
+.btn-cuest-finish {
+  padding: 0.78rem 1.8rem;
+  border: none;
+  border-radius: 50px;
+  background: linear-gradient(135deg, #4a8c3f 0%, #6db760 100%);
+  color: #fff;
+  font-family: 'Nunito', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(74,140,63,0.32);
+  transition: transform 0.18s, box-shadow 0.18s, filter 0.18s;
+}
+.btn-cuest-next:hover,
+.btn-cuest-finish:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(74,140,63,0.42);
+  filter: brightness(1.06);
+}
+.btn-cuest-next.disabled,
+.btn-cuest-finish.disabled {
+  background: #c5d9c0;
+  box-shadow: none;
+  cursor: not-allowed;
+  filter: none;
+  transform: none;
+}
+
+/* ── Responsive ───────────────────────────── */
+@media (max-width: 480px) {
+  .cuest-card { padding: 1.8rem 1.2rem; border-radius: 22px; }
+  .cuest-title { font-size: 1.2rem; }
+  .cuest-emoji { font-size: 2rem; }
+}
