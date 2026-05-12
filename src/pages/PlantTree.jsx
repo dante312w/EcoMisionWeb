@@ -30,9 +30,9 @@ export default function PlantTree() {
   const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || '';
 
   const defaultLocation = selectedLocation || {
-    lat: 4.7110,
-    lng: -74.0721,
-    address: 'Bogotá, Colombia',
+    lat: 2.43823,
+    lng: -76.61316,
+    address: 'Popayán, Colombia',
   };
 
   const impactoTotal  = selArbol.co2_anual * cantidad;
