@@ -225,7 +225,7 @@ export default function PlantTree() {
                         id="locationSearch"
                         className="form-control"
                         type="text"
-                        placeholder="Ej. Bogotá, Colombia"
+                        placeholder="Ej. Popayán, Colombia"
                         value={locationQuery}
                         onChange={(e) => setLocationQuery(e.target.value)}
                       />

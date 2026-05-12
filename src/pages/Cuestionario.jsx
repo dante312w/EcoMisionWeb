@@ -3,8 +3,8 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { secciones, calcularHuella } from '../data/cuestionario.js';
-import { guardarHuella } from '../service/api.js';
 import '../styles/cuestionario.css';
+import { guardarHuella } from '../service';
 
 export default function Cuestionario() {
   const navigate = useNavigate();

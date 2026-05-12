@@ -1,22 +1,30 @@
 // src/pages/Register.jsx
-// Crear cuenta con clases Bootstrap + paleta EcoMisión
+// Crear cuenta con Bootstrap + EcoMisión + API real
+
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { registerUser } from '../service';
 import '../styles/auth.css';
 
 export default function Register() {
   const navigate = useNavigate();
+
   const [form, setForm] = useState({
     name: '',
     email: '',
     password: '',
     confirmPassword: '',
   });
-  const [error, setError]     = useState('');
+
+  const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
+  /* ───── Handlers ───── */
   const handleChange = (e) =>
-    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+    setForm((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -24,52 +32,71 @@ export default function Register() {
 
     const { name, email, password, confirmPassword } = form;
 
+    // Validaciones frontend (UX)
     if (!name || !email || !password || !confirmPassword) {
       setError('Por favor completa todos los campos.');
       return;
     }
+
+    if (!email.trim()) {
+      setError('El correo es obligatorio.');
+      return;
+    }
+
     if (password.length < 6) {
       setError('La contraseña debe tener al menos 6 caracteres.');
       return;
     }
+
     if (password !== confirmPassword) {
       setError('Las contraseñas no coinciden.');
       return;
     }
 
     setLoading(true);
-    // TODO: reemplazar con llamada real a tu REST API
-    setTimeout(() => {
+
+    try {
+      // ✅ Llamada REAL al backend
+      await registerUser(name, email, password);
+
+      // Si todo sale bien, ir al login
+      navigate('/login');
+    } catch (err) {
+      // Mostrar error del backend
+      setError(err.message || 'Error al registrar usuario');
+    } finally {
       setLoading(false);
-      localStorage.setItem('eco_userEmail', email);
-      navigate('/cuestionario');
-    }, 1400);
+    }
   };
 
+  /* ───── Render ───── */
   return (
     <div className="auth-page">
       <span className="leaf-deco leaf-deco-1">🌿</span>
       <span className="leaf-deco leaf-deco-2">🍃</span>
 
       <div className="auth-card">
-
         {/* Logo */}
         <div className="text-center mb-4">
           <div className="auth-logo-icon mx-auto mb-2">🌍</div>
           <h1 className="auth-logo-title">EcoMisión</h1>
-          <p className="text-muted small">Únete a la misión por un planeta mejor</p>
+          <p className="text-muted small">
+            Únete a la misión por un planeta mejor
+          </p>
         </div>
 
-        {/* Bootstrap alert */}
+        {/* Error */}
         {error && (
-          <div className="alert alert-danger py-2 px-3 rounded-3 small" role="alert">
+          <div
+            className="alert alert-danger py-2 px-3 rounded-3 small"
+            role="alert"
+          >
             {error}
           </div>
         )}
 
-        {/* Bootstrap Register form */}
+        {/* Formulario */}
         <form onSubmit={handleSubmit} noValidate>
-
           <div className="form-floating mb-3">
             <input
               type="text"
@@ -148,16 +175,16 @@ export default function Register() {
               'Registrarse 🌱'
             )}
           </button>
-
         </form>
 
         <hr className="my-3" />
 
         <p className="text-center small text-muted mb-0">
           ¿Ya tienes cuenta?{' '}
-          <Link to="/login" className="eco-link fw-bold">Iniciar sesión</Link>
+          <Link to="/login" className="eco-link fw-bold">
+            Iniciar sesión
+          </Link>
         </p>
-
       </div>
     </div>
   );
