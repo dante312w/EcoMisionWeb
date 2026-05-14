@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { getRetosDelDia, getRetosActivos, completarReto } from '../service/retos.api';
+import { getHistorialUsuario } from '../service/history.api';
 import '../styles/dashboard.css';
 
 const DIFICULTAD_COLOR = { 'Fácil': 'success', 'Medio': 'warning', 'Difícil': 'danger' };
@@ -23,28 +24,30 @@ const DIFFICULTY_MAP = {
 
 function mapChallenge(c) {
   return {
-    _id:          c._id,
-    id:           c._id,
-    titulo:       c.title,
-    descripcion:  c.description,
-    categoria:    c.category,
+    _id:           c._id,
+    id:            c._id,
+    titulo:        c.title,
+    descripcion:   c.description,
+    categoria:     c.category,
     categoriaIcon: CATEGORY_ICON[c.category?.toLowerCase()] ?? '🌱',
-    dificultad:   DIFFICULTY_MAP[c.difficulty?.toLowerCase()] ?? 'Fácil',
-    puntos:       c.impact?.energy_kwh
-                    ? Math.round(c.impact.energy_kwh * 10)
-                    : 20,
-    huella_kg:    c.impact?.water_liters
-                    ? (c.impact.water_liters / 100).toFixed(1)
-                    : 1.0,
-    _raw: c,
+    dificultad:    DIFFICULTY_MAP[c.difficulty?.toLowerCase()] ?? 'Fácil',
+    puntos:        c.impact?.energy_kwh
+                     ? Math.round(c.impact.energy_kwh * 10)
+                     : 20,
+    huella_kg:     c.impact?.water_liters
+                     ? (c.impact.water_liters / 100).toFixed(1)
+                     : 1.0,
+    agua:          c.impact?.water_liters ?? 0,
+    energia:       c.impact?.energy_kwh   ?? 0,
+    _raw:          c,
   };
 }
 
-// ── Componente tarjeta ────────────────────────────────────────────────────────
-function RetoCard({ reto, onCompletar, onSustituir, completado, loading }) {
+// ── Tarjeta de reto pendiente ─────────────────────────────────────────────────
+function RetoCard({ reto, onCompletar, onSustituir, loading }) {
   const badge = DIFICULTAD_COLOR[reto.dificultad] ?? 'secondary';
   return (
-    <div className={`card dash-reto-card h-100 ${completado ? 'dash-reto-card--done' : ''}`}>
+    <div className="card dash-reto-card h-100">
       <div className="card-body d-flex flex-column gap-2">
         <div className="d-flex align-items-center justify-content-between">
           <span className="dash-cat-badge">
@@ -58,32 +61,81 @@ function RetoCard({ reto, onCompletar, onSustituir, completado, loading }) {
         <h6 className="dash-reto-title mb-0">{reto.titulo}</h6>
         <p className="dash-reto-desc mb-0">{reto.descripcion}</p>
 
+        <div className="d-flex gap-2 flex-wrap">
+          {reto.agua > 0 && (
+            <span className="dash-huella-pill" style={{ flex: 'none' }}>
+              💧 <strong>{reto.agua} L</strong>
+              <span className="ms-1 text-muted" style={{ fontSize: '0.75rem' }}>agua</span>
+            </span>
+          )}
+          {reto.energia > 0 && (
+            <span className="dash-huella-pill" style={{ flex: 'none' }}>
+              ⚡ <strong>{reto.energia} kWh</strong>
+              <span className="ms-1 text-muted" style={{ fontSize: '0.75rem' }}>energía</span>
+            </span>
+          )}
+        </div>
+
         <div className="dash-huella-pill">
           🌱 <strong>−{reto.huella_kg} kg CO₂</strong>
           <span className="ms-auto text-muted">{reto.puntos} pts</span>
         </div>
 
-        {completado ? (
-          <div className="dash-done-tag">✅ Completado</div>
-        ) : (
-          <div className="d-flex gap-2 mt-auto">
-            <button
-              className="btn btn-eco btn-sm flex-fill"
-              onClick={() => onCompletar(reto.id)}
-              disabled={loading === reto.id}
-            >
-              {loading === reto.id
-                ? <span className="spinner-border spinner-border-sm" />
-                : '✅ Completar'}
-            </button>
-            <button
-              className="btn dash-btn-swap btn-sm"
-              onClick={() => onSustituir(reto.id)}
-              disabled={loading === reto.id}
-              title="Sustituir reto"
-            >🔄</button>
-          </div>
-        )}
+        <div className="d-flex gap-2 mt-auto">
+          <button
+            className="btn btn-eco btn-sm flex-fill"
+            onClick={() => onCompletar(reto.id)}
+            disabled={loading === reto.id}
+          >
+            {loading === reto.id
+              ? <span className="spinner-border spinner-border-sm" />
+              : '✅ Completar'}
+          </button>
+          <button
+            className="btn dash-btn-swap btn-sm"
+            onClick={() => onSustituir(reto.id)}
+            disabled={loading === reto.id}
+            title="Sustituir reto"
+          >🔄</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Tarjeta de reto completado ────────────────────────────────────────────────
+function RetoCompletadoCard({ reto }) {
+  return (
+    <div className="card dash-reto-card dash-reto-card--done h-100">
+      <div className="card-body d-flex flex-column gap-2">
+        <div className="d-flex align-items-center justify-content-between">
+          <span className="dash-cat-badge">
+            {reto.categoriaIcon} {reto.categoria}
+          </span>
+          <span className="badge bg-success bg-opacity-15 text-success border border-success border-opacity-25">
+            {reto.dificultad}
+          </span>
+        </div>
+
+        <h6 className="dash-reto-title mb-0">{reto.titulo}</h6>
+        <p className="dash-reto-desc mb-0">{reto.descripcion}</p>
+
+        <div className="d-flex gap-2 flex-wrap">
+          {reto.agua > 0 && (
+            <span className="dash-huella-pill" style={{ flex: 'none' }}>
+              💧 <strong>{reto.agua} L</strong>
+              <span className="ms-1 text-muted" style={{ fontSize: '0.75rem' }}>agua</span>
+            </span>
+          )}
+          {reto.energia > 0 && (
+            <span className="dash-huella-pill" style={{ flex: 'none' }}>
+              ⚡ <strong>{reto.energia} kWh</strong>
+              <span className="ms-1 text-muted" style={{ fontSize: '0.75rem' }}>energía</span>
+            </span>
+          )}
+        </div>
+
+        <div className="dash-done-tag">✅ Completado hoy — +{reto.puntos} pts</div>
       </div>
     </div>
   );
@@ -105,50 +157,79 @@ export default function Dashboard() {
     alto:  { label: 'Huella alta 🔥',  color: 'danger',  pct: 90 },
   }[nivelHuella];
 
-  const [retos,         setRetos]        = useState([]);
-  const [retosPool,     setRetosPool]    = useState([]);
-  const [completados,   setCompletados]  = useState(new Set());
-  const [loadingId,     setLoadingId]    = useState(null);
-  const [iniciando,     setIniciando]    = useState(true);
-  const [error,         setError]        = useState('');
-  const [puntosTotales, setPuntosTotales] = useState(
+  const [retosPendientes,  setRetosPendientes]  = useState([]);
+  const [retosCompletados, setRetosCompletados] = useState([]);
+  const [retosPool,        setRetosPool]        = useState([]);
+  const [loadingId,        setLoadingId]        = useState(null);
+  const [iniciando,        setIniciando]        = useState(true);
+  const [error,            setError]            = useState('');
+  const [puntosTotales,    setPuntosTotales]    = useState(
     parseInt(localStorage.getItem('eco_puntos') ?? '0', 10)
   );
 
-  useEffect(() => {
-    if (!userId) { navigate('/login'); return; }
+useEffect(() => {
+  if (!userId) { navigate('/login'); return; }
 
-    const cargar = async () => {
-      try {
-        const [diarios, activos] = await Promise.all([
-          getRetosDelDia(userId),
-          getRetosActivos(),
-        ]);
-        setRetos(diarios.map(mapChallenge));
-        setRetosPool(activos.map(mapChallenge));
-      } catch (err) {
-        setError('No se pudieron cargar los retos. Intenta de nuevo.');
-      } finally {
+  const cargar = async () => {
+    try {
+      const [respuestaDiaria, activos, historial] = await Promise.all([
+        // getRetosDelDia devuelve { challenge, message }
+        fetch(`${import.meta.env.VITE_API_URL}/challenge/daily/${userId}`)
+          .then(r => r.json()),
+        getRetosActivos(),
+        getHistorialUsuario(userId),
+      ]);
+
+      setRetosPool(activos.map(mapChallenge));
+
+      const yaCompletado = respuestaDiaria.message?.toLowerCase().includes('ya completado');
+      const challenge    = respuestaDiaria.challenge;
+
+      if (!challenge) {
         setIniciando(false);
+        return;
       }
-    };
 
-    cargar();
-  }, [userId, navigate]);
+      // Si el snapshot está incompleto (solo tiene icon), buscar el reto completo
+      let retoCompleto = challenge;
+      if (!challenge.title) {
+        retoCompleto = activos.find(a => a.icon === challenge.icon) ?? challenge;
+      }
+
+      const mapped = mapChallenge(retoCompleto);
+
+      if (yaCompletado) {
+        setRetosPendientes([]);
+        setRetosCompletados([mapped]);
+      } else {
+        setRetosPendientes([mapped]);
+        setRetosCompletados([]);
+      }
+
+    } catch {
+      setError('No se pudieron cargar los retos. Intenta de nuevo.');
+    } finally {
+      setIniciando(false);
+    }
+  };
+
+  cargar();
+}, [userId, navigate]);
 
   const handleCompletar = async (id) => {
     setLoadingId(id);
-    const reto = retos.find((r) => r.id === id);
+    const reto = retosPendientes.find((r) => r.id === id);
     try {
       await completarReto(userId, reto._raw);
       const nuevos = puntosTotales + (reto?.puntos ?? 0);
       setPuntosTotales(nuevos);
       localStorage.setItem('eco_puntos', nuevos);
-      setCompletados((prev) => new Set([...prev, id]));
+      setRetosPendientes(prev => prev.filter(r => r.id !== id));
+      setRetosCompletados(prev => [...prev, reto]);
     } catch (err) {
-      // 409 = ya completó hoy → marcar visualmente igual
       if (err?.message?.includes('409') || err?.status === 409) {
-        setCompletados((prev) => new Set([...prev, id]));
+        setRetosPendientes(prev => prev.filter(r => r.id !== id));
+        setRetosCompletados(prev => [...prev, reto]);
       } else {
         setError('No se pudo completar el reto. Intenta de nuevo.');
       }
@@ -158,17 +239,16 @@ export default function Dashboard() {
   };
 
   const handleSustituir = (id) => {
-    const usados = retos.map((r) => r.id);
+    const usados = retosPendientes.map((r) => r.id);
     const pool   = retosPool.filter((r) => !usados.includes(r.id));
-    if (!pool.length) return; // no hay más retos disponibles
+    if (!pool.length) return;
     const nuevo  = pool[Math.floor(Math.random() * pool.length)];
-    setRetos((prev) => prev.map((r) => (r.id === id ? nuevo : r)));
-    setCompletados((prev) => { const s = new Set(prev); s.delete(id); return s; });
+    setRetosPendientes(prev => prev.map(r => r.id === id ? nuevo : r));
   };
 
-  const retosCompletados = completados.size;
-  const progresoRetos    = retos.length
-    ? Math.round((retosCompletados / retos.length) * 100)
+  const totalRetos    = retosPendientes.length + retosCompletados.length;
+  const progresoRetos = totalRetos
+    ? Math.round((retosCompletados.length / totalRetos) * 100)
     : 0;
 
   return (
@@ -231,12 +311,12 @@ export default function Dashboard() {
           </div>
         </section>
 
-        {/* Progreso de retos del día */}
+        {/* Retos del día */}
         <section className="dash-card-section">
           <div className="d-flex align-items-center justify-content-between mb-2">
             <h6 className="dash-section-label mb-0">Retos de hoy</h6>
             <span className="dash-retos-progress-label">
-              {retosCompletados}/{retos.length} completados
+              {retosCompletados.length}/{totalRetos} completados
             </span>
           </div>
           <div className="progress mb-3" style={{ height: '6px' }}>
@@ -267,19 +347,46 @@ export default function Dashboard() {
               ))}
             </div>
           ) : (
-            <div className="row g-3">
-              {retos.map((r, i) => (
-                <div key={r.id ?? i} className="col-12">
-                  <RetoCard
-                    reto={r}
-                    completado={completados.has(r.id)}
-                    loading={loadingId}
-                    onCompletar={handleCompletar}
-                    onSustituir={handleSustituir}
-                  />
+            <>
+              {/* Pendientes */}
+              {retosPendientes.length > 0 && (
+                <div className="row g-3">
+                  {retosPendientes.map((r, i) => (
+                    <div key={r.id ?? i} className="col-12">
+                      <RetoCard
+                        reto={r}
+                        loading={loadingId}
+                        onCompletar={handleCompletar}
+                        onSustituir={handleSustituir}
+                      />
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
+              )}
+
+              {/* Completados hoy */}
+              {retosCompletados.length > 0 && (
+                <>
+                  <h6 className="dash-section-label mt-4 mb-2">✅ Completados hoy</h6>
+                  <div className="row g-3">
+                    {retosCompletados.map((r, i) => (
+                      <div key={r.id ?? i} className="col-12">
+                        <RetoCompletadoCard reto={r} />
+                      </div>
+                    ))}
+                  </div>
+                </>
+              )}
+
+              {/* Todo completado */}
+              {retosPendientes.length === 0 && retosCompletados.length > 0 && (
+                <div className="text-center text-muted py-3">
+                  <div style={{ fontSize: '2rem' }}>🎉</div>
+                  <p className="small mt-1 mb-0">¡Completaste todos los retos de hoy!</p>
+                  <Link to="/history" className="btn btn-eco btn-sm mt-2">Ver historial</Link>
+                </div>
+              )}
+            </>
           )}
         </section>
 
@@ -292,6 +399,9 @@ export default function Dashboard() {
       <nav className="dash-bottom-nav">
         <Link to="/dashboard" className="dash-nav-item dash-nav-item--active">
           <span className="dash-nav-icon">🎯</span><span>Retos</span>
+        </Link>
+        <Link to="/history" className="dash-nav-item">
+          <span className="dash-nav-icon">📋</span><span>Historial</span>
         </Link>
         <Link to="/plant-tree" className="dash-nav-item">
           <span className="dash-nav-icon">🌳</span><span>Árbol</span>

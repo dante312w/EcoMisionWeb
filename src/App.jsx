@@ -8,6 +8,7 @@ import Cuestionario from './pages/Cuestionario.jsx';
 import Dashboard    from './pages/Dashboard.jsx';
 import PlantTree    from './pages/PlantTree.jsx';
 import Profile      from './pages/Profile.jsx';
+import History from './pages/History';
 // Próximamente:
 // import Reto      from './pages/Reto.jsx';
 // import Historial from './pages/Historial.jsx';
@@ -24,6 +25,8 @@ export default function App() {
         <Route path="/dashboard"    element={<Dashboard />}    />
         <Route path="/plant-tree"   element={<PlantTree />}    />
         <Route path="/profile"      element={<Profile />}      />
+        
+        <Route path="/history" element={<History />} />
         {/* <Route path="/reto"      element={<Reto />}         /> */}
         <Route path="*"             element={<Navigate to="/" replace />} />
       </Routes>
