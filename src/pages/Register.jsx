@@ -57,7 +57,7 @@ export default function Register() {
 
     try {
       // ✅ Llamada REAL al backend
-      await registerUser(name, email, password);
+      await registerUser({ name, email, password });
 
       // Si todo sale bien, ir al login
       navigate('/login');

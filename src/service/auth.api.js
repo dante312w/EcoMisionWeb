@@ -16,7 +16,7 @@ function decodeJwt(token) {
 export const loginUser = async (email, password) => {
   const data = await request('/login', {
     method: 'POST',
-    body: JSON.stringify({ email, password }),
+    body: { email, password },
   });
 
   if (!data?.token) throw new Error('No se recibió token de autenticación');
@@ -43,10 +43,10 @@ export const loginUser = async (email, password) => {
   return data;
 };
 
-export const registerUser = async (name, email, password) => {
-  return await request('/user', {
+export const registerUser = async ({ name, email, password }) => {
+  return await request('/register', {
     method: 'POST',
-    body: JSON.stringify({ name, email, password }),
+    body: { name, email, password },
   });
 };
 
