@@ -9,6 +9,9 @@ import Dashboard    from './pages/Dashboard.jsx';
 import PlantTree    from './pages/PlantTree.jsx';
 import Profile      from './pages/Profile.jsx';
 import History from './pages/History';
+import 'leaflet/dist/leaflet.css';
+
+
 // Próximamente:
 // import Reto      from './pages/Reto.jsx';
 // import Historial from './pages/Historial.jsx';

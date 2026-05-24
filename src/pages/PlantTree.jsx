@@ -4,6 +4,8 @@ import { request } from '../service/api.js';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import '../styles/dashboard.css';
+import TreeMapLeaflet from '../components/TreeMapLeaflet';
+
 
 const ARBOLES = [
   { id: 'roble',    nombre: 'Roble',    icon: '🌳', co2_anual: 21, tiempo: '5-10 años', descripcion: 'Árbol longevo que absorbe hasta 21 kg de CO₂/año en su madurez.' },
@@ -32,6 +34,33 @@ export default function PlantTree() {
   );
   const [locationLoading, setLocationLoading] = useState(false);
   const [locationError,   setLocationError]   = useState('');
+
+  const handleGeolocate = () => {
+  if (!navigator.geolocation) {
+    setPlantError('Tu navegador no soporta geolocalización');
+    return;
+  }
+
+  navigator.geolocation.getCurrentPosition(
+    (pos) => {
+      const location = {
+        lat: pos.coords.latitude,
+        lng: pos.coords.longitude,
+        address: 'Ubicación actual',
+      };
+
+      setSelectedLocation(location);
+      localStorage.setItem('eco_plant_location', JSON.stringify(location));
+    },
+    (err) => {
+      console.error(err);
+      setPlantError('Permiso denegado o error de ubicación');
+    }
+  );
+};
+
+
+
 
   const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || '';
 
@@ -84,6 +113,7 @@ export default function PlantTree() {
   /* ── Plantar (usar request directo a /history) ────────────────────────── */
   const handlePlantar = async () => {
     const userId = localStorage.getItem('eco_userId');
+    const username = localStorage.getItem('eco_username') || 'Usuario';
     if (!userId) {
       setPlantError('No se encontró tu sesión.');
       return;
@@ -95,32 +125,47 @@ export default function PlantTree() {
     const locationToSend = selectedLocation || defaultLocation;
 
     try {
-      await request('/history', {
+      await request('/tree', {
         method: 'POST',
         body: {
-          userId,
-          action: 'ARBOL',
-          data: {
-            treeType: selArbol.id,
-            treeName: selArbol.nombre,
-            quantity: cantidad,
-            co2_capture_annual: impactoTotal,
-            location: {
-              lat: locationToSend.lat,
-              lng: locationToSend.lng,
-              address: locationToSend.address,
-            },
+          user_id: userId,
+          username: username,
+          tree_type: selArbol.nombre,
+
+          planted_at: new Date(),
+
+          location: {
+            type: "Point",
+            coordinates: [
+              locationToSend.lng,
+              locationToSend.lat
+            ]
           },
-        },
+
+          visible_on_map: true
+        }
       });
 
       const nuevos = plantados + cantidad;
       setPlantados(nuevos);
       localStorage.setItem('eco_arboles', nuevos);
       setResultado({ arbol: selArbol, cantidad, co2: impactoTotal, location: locationToSend });
-    } catch (err) {
-      console.error('[PlantTree] Error al plantar:', err);
-      setPlantError('No se pudo guardar en el servidor: ' + (err.message || err));
+      } catch (err) {
+      console.error('❌ ERROR COMPLETO:', err);
+
+      if (err.response) {
+        console.error('❌ STATUS:', err.response.status);
+        console.error('❌ DATA BACKEND:', err.response.data);
+      } else {
+        console.error('❌ ERROR SIN RESPONSE:', err);
+      }
+
+      setPlantError(
+        err.response?.data?.message || 
+        err.message || 
+        'Error al guardar en el servidor'
+      );
+
     } finally {
       setPlantando(false);
     }
@@ -202,14 +247,8 @@ export default function PlantTree() {
                   <div className="card-body">
                     <p className="mb-1 fw-bold">Sitio de plantación</p>
                     <p className="small text-muted mb-2">{resultado.location.address}</p>
-                    <div className="ratio ratio-16x9 rounded-4 overflow-hidden">
-                      <iframe
-                        title="Ubicación del árbol plantado"
-                        src={`https://www.google.com/maps/embed/v1/view?key=${GOOGLE_MAPS_API_KEY}&center=${resultado.location.lat},${resultado.location.lng}&zoom=15`}
-                        allowFullScreen
-                        loading="lazy"
-                        referrerPolicy="no-referrer-when-downgrade"
-                      />
+                    <div className="rounded-4 overflow-hidden" style={{ height: '240px' }}>
+                      <TreeMapLeaflet center={resultado.location} />
                     </div>
                   </div>
                 </div>
@@ -278,6 +317,17 @@ export default function PlantTree() {
                     <label htmlFor="locationSearch" className="form-label">
                       Dirección o ciudad (opcional)
                     </label>
+                    
+                    <div className="mb-2">
+                        <button
+                          type="button"
+                          className="btn btn-eco"
+                          onClick={handleGeolocate}
+                        >
+                          📍 Usar mi ubicación
+                        </button>
+                      </div>
+
                     <div className="input-group">
                       <input
                         id="locationSearch"
@@ -337,14 +387,11 @@ export default function PlantTree() {
                     </div>
                     {GOOGLE_MAPS_API_KEY ? (
                       <div className="ratio ratio-16x9 rounded-4 overflow-hidden">
-                        <iframe
-                          title="Mapa de ubicación de plantación"
-                          src={`https://www.google.com/maps/embed/v1/view?key=${GOOGLE_MAPS_API_KEY}&center=${defaultLocation.lat},${defaultLocation.lng}&zoom=13`}
-                          allowFullScreen
-                          loading="lazy"
-                          referrerPolicy="no-referrer-when-downgrade"
-                        />
+                      <div style={{ width: '100%', height: '100%' }}>
+                        <TreeMapLeaflet center={defaultLocation} />
                       </div>
+                    </div>
+
                     ) : (
                       <div className="text-center text-muted py-3 small">
                         Configura <code>VITE_GOOGLE_MAPS_API_KEY</code> para ver el mapa
