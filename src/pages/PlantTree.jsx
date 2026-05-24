@@ -1,32 +1,38 @@
 // src/pages/PlantTree.jsx
+// ── Versión con llamada real a la API (plantarArbol) + guardado lat/lng
+import { request } from '../service/api.js';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import '../styles/dashboard.css';
 
 const ARBOLES = [
-  { id: 'roble',    nombre: 'Roble',      icon: '🌳', co2_anual: 21,  tiempo: '5-10 años', descripcion: 'Árbol longevo que absorbe hasta 21 kg de CO₂/año en su madurez.' },
-  { id: 'pino',     nombre: 'Pino',       icon: '🌲', co2_anual: 11,  tiempo: '3-5 años',  descripcion: 'Crece rápido y es ideal para reforestación en zonas altas.' },
-  { id: 'mango',    nombre: 'Mango',      icon: '🥭', co2_anual: 8,   tiempo: '2-4 años',  descripcion: 'Árbol frutal tropical que combina producción de alimentos y captura de CO₂.' },
-  { id: 'bambú',    nombre: 'Bambú',      icon: '🎋', co2_anual: 35,  tiempo: '1-2 años',  descripcion: 'El bambú captura CO₂ 25 veces más rápido que cualquier árbol.' },
-  { id: 'aguacate', nombre: 'Aguacate',   icon: '🫒', co2_anual: 6,   tiempo: '3-6 años',  descripcion: 'Frutal popular en Colombia que también contribuye a la captura de carbono.' },
+  { id: 'roble',    nombre: 'Roble',    icon: '🌳', co2_anual: 21, tiempo: '5-10 años', descripcion: 'Árbol longevo que absorbe hasta 21 kg de CO₂/año en su madurez.' },
+  { id: 'pino',     nombre: 'Pino',     icon: '🌲', co2_anual: 11, tiempo: '3-5 años',  descripcion: 'Crece rápido y es ideal para reforestación en zonas altas.' },
+  { id: 'mango',    nombre: 'Mango',    icon: '🥭', co2_anual: 8,  tiempo: '2-4 años',  descripcion: 'Árbol frutal tropical que combina producción de alimentos y captura de CO₂.' },
+  { id: 'bambú',    nombre: 'Bambú',    icon: '🎋', co2_anual: 35, tiempo: '1-2 años',  descripcion: 'El bambú captura CO₂ 25 veces más rápido que cualquier árbol.' },
+  { id: 'aguacate', nombre: 'Aguacate', icon: '🫒', co2_anual: 6,  tiempo: '3-6 años',  descripcion: 'Frutal popular en Colombia que también contribuye a la captura de carbono.' },
 ];
 
 const CANTIDADES = [1, 3, 5, 10, 20];
 
 export default function PlantTree() {
-  const [selArbol,    setSelArbol]    = useState(ARBOLES[0]);
-  const [cantidad,    setCantidad]    = useState(1);
-  const [plantando,   setPlantando]   = useState(false);
-  const [resultado,   setResultado]   = useState(null);
-  const [plantados,   setPlantados]   = useState(
+  const [selArbol,       setSelArbol]       = useState(ARBOLES[0]);
+  const [cantidad,       setCantidad]       = useState(1);
+  const [plantando,      setPlantando]      = useState(false);
+  const [resultado,      setResultado]      = useState(null);
+  const [plantError,     setPlantError]     = useState('');
+  const [plantados,      setPlantados]      = useState(
     parseInt(localStorage.getItem('eco_arboles') ?? '0', 10)
   );
-  const [locationQuery, setLocationQuery] = useState('');
+
+  // Ubicación
+  const [locationQuery,    setLocationQuery]    = useState('');
   const [selectedLocation, setSelectedLocation] = useState(
     JSON.parse(localStorage.getItem('eco_plant_location') || 'null')
   );
   const [locationLoading, setLocationLoading] = useState(false);
-  const [locationError, setLocationError] = useState('');
+  const [locationError,   setLocationError]   = useState('');
+
   const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || '';
 
   const defaultLocation = selectedLocation || {
@@ -38,6 +44,7 @@ export default function PlantTree() {
   const impactoTotal  = selArbol.co2_anual * cantidad;
   const impacto10años = impactoTotal * 10;
 
+  /* ── Geocodificación ────────────────────────────────────────────────────── */
   const handleBuscarUbicacion = async () => {
     if (!locationQuery.trim()) {
       setLocationError('Ingresa una dirección o ciudad.');
@@ -56,7 +63,7 @@ export default function PlantTree() {
         locationQuery
       )}&key=${GOOGLE_MAPS_API_KEY}`;
       const response = await fetch(url);
-      const data = await response.json();
+      const data     = await response.json();
 
       if (data.status !== 'OK' || !data.results?.length) {
         throw new Error('No se encontró la ubicación.');
@@ -64,11 +71,7 @@ export default function PlantTree() {
 
       const result = data.results[0];
       const { lat, lng } = result.geometry.location;
-      const location = {
-        address: result.formatted_address,
-        lat,
-        lng,
-      };
+      const location = { address: result.formatted_address, lat, lng };
       setSelectedLocation(location);
       localStorage.setItem('eco_plant_location', JSON.stringify(location));
     } catch (err) {
@@ -78,19 +81,58 @@ export default function PlantTree() {
     }
   };
 
+  /* ── Plantar (usar request directo a /history) ────────────────────────── */
   const handlePlantar = async () => {
+    const userId = localStorage.getItem('eco_userId');
+    if (!userId) {
+      setPlantError('No se encontró tu sesión.');
+      return;
+    }
+
     setPlantando(true);
-    // TODO: await api.plantarArbol({ arbol: selArbol.id, cantidad, location: selectedLocation })
-    await new Promise((r) => setTimeout(r, 1400));
-    const nuevos = plantados + cantidad;
-    setPlantados(nuevos);
-    localStorage.setItem('eco_arboles', nuevos);
-    setResultado({ arbol: selArbol, cantidad, co2: impactoTotal, location: selectedLocation });
-    setPlantando(false);
+    setPlantError('');
+
+    const locationToSend = selectedLocation || defaultLocation;
+
+    try {
+      await request('/history', {
+        method: 'POST',
+        body: {
+          userId,
+          action: 'ARBOL',
+          data: {
+            treeType: selArbol.id,
+            treeName: selArbol.nombre,
+            quantity: cantidad,
+            co2_capture_annual: impactoTotal,
+            location: {
+              lat: locationToSend.lat,
+              lng: locationToSend.lng,
+              address: locationToSend.address,
+            },
+          },
+        },
+      });
+
+      const nuevos = plantados + cantidad;
+      setPlantados(nuevos);
+      localStorage.setItem('eco_arboles', nuevos);
+      setResultado({ arbol: selArbol, cantidad, co2: impactoTotal, location: locationToSend });
+    } catch (err) {
+      console.error('[PlantTree] Error al plantar:', err);
+      setPlantError('No se pudo guardar en el servidor: ' + (err.message || err));
+    } finally {
+      setPlantando(false);
+    }
   };
 
-  const handleNuevo = () => setResultado(null);
 
+  const handleNuevo = () => {
+    setResultado(null);
+    setPlantError('');
+  };
+
+  /* ── Render ─────────────────────────────────────────────────────────────── */
   return (
     <div className="dash-page">
       <span className="leaf-deco leaf-deco-1">🌿</span>
@@ -130,6 +172,22 @@ export default function PlantTree() {
               <div className="dash-huella-pill justify-content-center mb-4">
                 📅 <strong>−{resultado.co2 * 10} kg CO₂</strong> en 10 años
               </div>
+
+              {plantError && (
+                <div className="alert alert-warning py-2 px-3 rounded-3 small mb-3">
+                  {plantError}
+                </div>
+              )}
+
+              {resultado.location && (
+                <div className="mb-3 small text-muted">
+                  📍 <strong>{resultado.location.address}</strong><br />
+                  <span style={{ fontFamily: 'monospace', fontSize: '0.75rem' }}>
+                    {resultado.location.lat.toFixed(5)}, {resultado.location.lng.toFixed(5)}
+                  </span>
+                </div>
+              )}
+
               <div className="d-flex gap-2 justify-content-center flex-wrap">
                 <button className="btn btn-eco" onClick={handleNuevo}>
                   🌳 Plantar más
@@ -139,7 +197,7 @@ export default function PlantTree() {
                 </Link>
               </div>
 
-              {resultado.location ? (
+              {resultado.location && GOOGLE_MAPS_API_KEY && (
                 <div className="mt-4 card dash-reto-card">
                   <div className="card-body">
                     <p className="mb-1 fw-bold">Sitio de plantación</p>
@@ -155,7 +213,7 @@ export default function PlantTree() {
                     </div>
                   </div>
                 </div>
-              ) : null}
+              )}
             </div>
           </section>
         ) : (
@@ -228,6 +286,7 @@ export default function PlantTree() {
                         placeholder="Ej. Popayán, Colombia"
                         value={locationQuery}
                         onChange={(e) => setLocationQuery(e.target.value)}
+                        onKeyDown={(e) => e.key === 'Enter' && handleBuscarUbicacion()}
                       />
                       <button
                         type="button"
@@ -247,6 +306,26 @@ export default function PlantTree() {
                     )}
                   </div>
 
+                  {/* Mini-info de coordenadas cuando hay ubicación seleccionada */}
+                  {selectedLocation && (
+                    <div className="alert alert-success py-2 px-3 rounded-3 small mb-3 d-flex justify-content-between align-items-center">
+                      <span>
+                        📍 {selectedLocation.address}<br />
+                        <span style={{ fontFamily: 'monospace', fontSize: '0.72rem' }}>
+                          {selectedLocation.lat.toFixed(5)}, {selectedLocation.lng.toFixed(5)}
+                        </span>
+                      </span>
+                      <button
+                        type="button"
+                        className="btn btn-outline-secondary btn-sm ms-2"
+                        onClick={() => {
+                          setSelectedLocation(null);
+                          localStorage.removeItem('eco_plant_location');
+                        }}
+                      >✕</button>
+                    </div>
+                  )}
+
                   <div className="pt-map-preview">
                     <div className="d-flex align-items-center justify-content-between mb-2">
                       <div>
@@ -255,23 +334,22 @@ export default function PlantTree() {
                         </p>
                         <p className="small text-muted mb-0">{defaultLocation.address}</p>
                       </div>
-                      {selectedLocation && (
-                        <button
-                          type="button"
-                          className="btn btn-outline-secondary btn-sm"
-                          onClick={() => setSelectedLocation(null)}
-                        >Cambiar</button>
-                      )}
                     </div>
-                    <div className="ratio ratio-16x9 rounded-4 overflow-hidden">
-                      <iframe
-                        title="Mapa de ubicación de plantación"
-                        src={`https://www.google.com/maps/embed/v1/view?key=${GOOGLE_MAPS_API_KEY}&center=${defaultLocation.lat},${defaultLocation.lng}&zoom=13`}
-                        allowFullScreen
-                        loading="lazy"
-                        referrerPolicy="no-referrer-when-downgrade"
-                      />
-                    </div>
+                    {GOOGLE_MAPS_API_KEY ? (
+                      <div className="ratio ratio-16x9 rounded-4 overflow-hidden">
+                        <iframe
+                          title="Mapa de ubicación de plantación"
+                          src={`https://www.google.com/maps/embed/v1/view?key=${GOOGLE_MAPS_API_KEY}&center=${defaultLocation.lat},${defaultLocation.lng}&zoom=13`}
+                          allowFullScreen
+                          loading="lazy"
+                          referrerPolicy="no-referrer-when-downgrade"
+                        />
+                      </div>
+                    ) : (
+                      <div className="text-center text-muted py-3 small">
+                        Configura <code>VITE_GOOGLE_MAPS_API_KEY</code> para ver el mapa
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -309,6 +387,13 @@ export default function PlantTree() {
               </div>
             </section>
 
+            {/* Error al plantar */}
+            {plantError && (
+              <div className="alert alert-danger py-2 px-3 rounded-3 small mb-3">
+                {plantError}
+              </div>
+            )}
+
             {/* Botón plantar */}
             <section className="dash-card-section pb-4">
               <button
@@ -325,6 +410,11 @@ export default function PlantTree() {
                   `🌱 Plantar ${cantidad} ${selArbol.nombre}${cantidad > 1 ? 's' : ''} ahora`
                 )}
               </button>
+              {!selectedLocation && (
+                <p className="text-muted small text-center mt-2 mb-0">
+                  Se usará la ubicación predeterminada (Popayán) si no buscas una.
+                </p>
+              )}
             </section>
           </>
         )}
@@ -335,6 +425,9 @@ export default function PlantTree() {
         <Link to="/dashboard"  className="dash-nav-item">
           <span className="dash-nav-icon">🎯</span><span>Retos</span>
         </Link>
+        <Link to="/history" className="dash-nav-item">
+          <span className="dash-nav-icon">📋</span><span>Historial</span>
+        </Link>
         <Link to="/plant-tree" className="dash-nav-item dash-nav-item--active">
           <span className="dash-nav-icon">🌳</span><span>Árbol</span>
         </Link>
@@ -344,4 +437,6 @@ export default function PlantTree() {
       </nav>
     </div>
   );
+
 }
+

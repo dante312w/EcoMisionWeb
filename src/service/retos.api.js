@@ -26,6 +26,6 @@ export const getRetosActivos = async () => {
 export const completarReto = async (userId, challenge) => {
   return await request('/challenge/complete', {
     method: 'POST',
-    body: JSON.stringify({ userId, challenge }),
+    body: { userId, challenge },
   });
 };
