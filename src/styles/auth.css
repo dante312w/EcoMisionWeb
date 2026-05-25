@@ -1,310 +1,371 @@
 /* =============================================
-   EcoMisión – Auth Styles (Login & Register)
+   EcoMisión – Auth Styles v2
+   Inspirado en el diseño móvil: fondo natural,
+   campos minimalistas, logo prominente
    ============================================= */
 
-@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&family=Playfair+Display:wght@700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,700;1,600&display=swap');
 
 :root {
-  --eco-green:        #4a8c3f;
-  --eco-green-light:  #6db760;
+  --eco-green:        #3a7d3f;
+  --eco-green-mid:    #5a9e5f;
+  --eco-green-light:  #8bc34a;
   --eco-green-pale:   #e8f5e4;
-  --eco-lavender:     #c9bfe8;
-  --eco-lavender-btn: #b8aede;
-  --eco-lavender-dark:#9b8ec4;
+  --eco-lavender:     #b39ddb;
+  --eco-lavender-dark:#7e57c2;
   --eco-white:        #ffffff;
-  --eco-cloud:        #f0f4f8;
-  --eco-text:         #3a3a3a;
-  --eco-text-soft:    #8a9ba8;
-  --eco-shadow:       rgba(74, 140, 63, 0.18);
+  --eco-text:         #2c3e2d;
+  --eco-text-soft:    #7a9b7e;
+  --eco-cloud:        rgba(255,255,255,0.72);
+  --eco-input-border: rgba(90,158,95,0.35);
+  --eco-shadow-green: rgba(58,125,63,0.22);
 }
 
-/* ── Base ─────────────────────────────────── */
+/* ── Reset base ──────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* ── Page shell ──────────────────────────────── */
 .auth-page {
-  font-family: 'Nunito', sans-serif;
+  font-family: 'Quicksand', sans-serif;
   min-height: 100vh;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  background: linear-gradient(170deg, #eaf4e6 0%, #f5f0ff 50%, #dff0e8 100%);
+  justify-content: flex-start;
   position: relative;
   overflow: hidden;
-  padding: 2rem 1rem;
+  background: linear-gradient(180deg,
+    #e8f4e0 0%,
+    #d4ecd8 18%,
+    #c8e8f0 45%,
+    #ddf0e8 65%,
+    #e2f0da 80%,
+    #c5dfc0 100%
+  );
 }
 
-/* ── Decorative blobs ─────────────────────── */
-.auth-page::before,
-.auth-page::after {
+/* ── Sky clouds SVG background ───────────────── */
+.auth-page::before {
   content: '';
   position: fixed;
-  border-radius: 50%;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 420px 180px at 20% 30%, rgba(255,255,255,0.55) 0%, transparent 70%),
+    radial-gradient(ellipse 320px 140px at 75% 20%, rgba(255,255,255,0.45) 0%, transparent 70%),
+    radial-gradient(ellipse 280px 120px at 50% 45%, rgba(200,232,240,0.4) 0%, transparent 70%);
   pointer-events: none;
   z-index: 0;
 }
-.auth-page::before {
-  width: 520px; height: 520px;
-  background: radial-gradient(circle, rgba(180,230,160,0.35) 0%, transparent 70%);
-  top: -180px; left: -180px;
-}
-.auth-page::after {
-  width: 420px; height: 420px;
-  background: radial-gradient(circle, rgba(190,180,240,0.28) 0%, transparent 70%);
-  bottom: -160px; right: -160px;
+
+/* ── Grass / hills SVG at bottom ─────────────── */
+.auth-hills {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 0;
+  pointer-events: none;
+  line-height: 0;
 }
 
-/* floating leaves decoration */
-.leaf-deco {
+/* ── Floating leaves ─────────────────────────── */
+.auth-leaf {
   position: fixed;
   pointer-events: none;
   z-index: 0;
-  opacity: 0.12;
-  font-size: 5rem;
+  opacity: 0;
+  animation: leafFloat 12s ease-in-out infinite;
 }
-.leaf-deco-1 { bottom: 40px; left: 20px; transform: rotate(-20deg); font-size: 6rem; opacity: 0.15; }
-.leaf-deco-2 { top: 60px;    right: 30px; transform: rotate(30deg);  font-size: 4rem; }
+.auth-leaf-1 {
+  bottom: 120px; left: 8px;
+  font-size: 3.5rem;
+  animation-delay: 0s;
+  opacity: 0.55;
+}
+.auth-leaf-2 {
+  bottom: 80px; left: 40px;
+  font-size: 2.2rem;
+  animation-delay: 1.5s;
+  opacity: 0.4;
+}
+.auth-leaf-3 {
+  bottom: 110px; right: 12px;
+  font-size: 3rem;
+  animation-delay: 0.8s;
+  opacity: 0.5;
+  transform: scaleX(-1);
+}
+.auth-leaf-4 {
+  bottom: 70px; right: 50px;
+  font-size: 2rem;
+  animation-delay: 2s;
+  opacity: 0.35;
+  transform: scaleX(-1);
+}
 
-/* ── Card ─────────────────────────────────── */
+@keyframes leafFloat {
+  0%,100% { transform: translateY(0) rotate(-5deg); }
+  50%      { transform: translateY(-12px) rotate(5deg); }
+}
+.auth-leaf-3, .auth-leaf-4 {
+  animation-name: leafFloatR;
+}
+@keyframes leafFloatR {
+  0%,100% { transform: scaleX(-1) translateY(0) rotate(-5deg); }
+  50%      { transform: scaleX(-1) translateY(-10px) rotate(5deg); }
+}
+
+/* ── Card ─────────────────────────────────────── */
 .auth-card {
   position: relative;
-  z-index: 1;
-  background: rgba(255, 255, 255, 0.82);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255,255,255,0.6);
-  border-radius: 28px;
-  padding: 2.8rem 2.4rem;
+  z-index: 2;
   width: 100%;
-  max-width: 430px;
-  box-shadow: 0 8px 40px var(--eco-shadow), 0 2px 12px rgba(0,0,0,0.06);
-  animation: cardIn 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+  max-width: 400px;
+  padding: 0 1.8rem 2.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  animation: cardIn 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 @keyframes cardIn {
-  from { opacity: 0; transform: translateY(30px) scale(0.97); }
-  to   { opacity: 1; transform: translateY(0)    scale(1);    }
+  from { opacity: 0; transform: translateY(28px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
-/* ── Logo / Brand ─────────────────────────── */
-.auth-logo {
-  text-align: center;
-  margin-bottom: 1.6rem;
-}
-.auth-logo-icon {
-  width: 80px; height: 80px;
-  background: linear-gradient(135deg, var(--eco-green-pale) 0%, #d6f0cf 100%);
-  border-radius: 50%;
-  display: inline-flex;
+/* ── Logo block ───────────────────────────────── */
+.auth-logo-wrap {
+  display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  margin-bottom: 0.75rem;
-  box-shadow: 0 4px 16px rgba(74,140,63,0.2);
-  font-size: 2.4rem;
-  animation: pulse-logo 3s ease-in-out infinite;
+  padding-top: 3.5rem;
+  margin-bottom: 2rem;
 }
-@keyframes pulse-logo {
-  0%,100% { transform: scale(1); }
-  50%      { transform: scale(1.05); }
+
+.auth-logo-img {
+  width: 110px;
+  height: 110px;
+  object-fit: contain;
+  border-radius: 28px;
+  filter: drop-shadow(0 8px 24px rgba(58,125,63,0.35));
+  animation: logoPulse 4s ease-in-out infinite;
 }
+
+@keyframes logoPulse {
+  0%,100% { transform: scale(1) translateY(0); }
+  50%      { transform: scale(1.04) translateY(-4px); }
+}
+
 .auth-logo-title {
   font-family: 'Playfair Display', serif;
   font-size: 2rem;
   font-weight: 700;
   color: var(--eco-green);
-  margin: 0;
-  letter-spacing: -0.5px;
-}
-.auth-logo-subtitle {
-  font-size: 0.85rem;
-  color: var(--eco-text-soft);
-  margin-top: 0.2rem;
+  margin-top: 0.7rem;
+  letter-spacing: -0.3px;
 }
 
-/* ── Page heading (inside card, no logo) ─── */
+/* ── Page heading ─────────────────────────────── */
 .auth-heading {
-  font-family: 'Nunito', sans-serif;
-  font-size: 1.5rem;
-  font-weight: 800;
-  color: var(--eco-green);
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--eco-text);
   text-align: center;
-  margin-bottom: 0.3rem;
-}
-.auth-subheading {
-  font-size: 0.85rem;
-  color: var(--eco-text-soft);
-  text-align: center;
-  margin-bottom: 1.8rem;
+  margin-bottom: 0.25rem;
+  letter-spacing: -0.2px;
 }
 
-/* ── Form inputs ──────────────────────────── */
-.auth-input-group {
-  position: relative;
-  margin-bottom: 1.1rem;
+.auth-subheading {
+  font-size: 0.88rem;
+  color: var(--eco-text-soft);
+  text-align: center;
+  margin-bottom: 2rem;
 }
-.auth-input-group .input-icon {
+
+/* ── Inputs (estilo línea inferior) ───────────── */
+.auth-field {
+  width: 100%;
+  margin-bottom: 1.4rem;
+  position: relative;
+}
+
+.auth-field input {
+  width: 100%;
+  background: transparent;
+  border: none;
+  border-bottom: 1.5px solid var(--eco-input-border);
+  padding: 0.6rem 0.2rem 0.6rem 1.8rem;
+  font-family: 'Quicksand', sans-serif;
+  font-size: 1rem;
+  color: var(--eco-text);
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.auth-field input::placeholder {
+  color: var(--eco-text-soft);
+  font-size: 0.95rem;
+}
+
+.auth-field input:focus {
+  border-bottom-color: var(--eco-green);
+}
+
+.auth-field-icon {
   position: absolute;
-  left: 14px;
+  left: 0;
   top: 50%;
   transform: translateY(-50%);
   color: var(--eco-text-soft);
   font-size: 1rem;
   pointer-events: none;
 }
-.auth-input {
-  width: 100%;
-  border: 1.5px solid #d8e8d4;
-  border-radius: 14px;
-  padding: 0.78rem 1rem 0.78rem 2.6rem;
-  font-family: 'Nunito', sans-serif;
-  font-size: 0.95rem;
-  color: var(--eco-text);
-  background: rgba(255,255,255,0.75);
-  transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
-  outline: none;
+
+/* Línea animada al hacer focus */
+.auth-field::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0;
+  width: 0;
+  height: 2px;
+  background: var(--eco-green);
+  border-radius: 2px;
+  transition: width 0.3s ease;
 }
-.auth-input::placeholder { color: var(--eco-text-soft); }
-.auth-input:focus {
-  border-color: var(--eco-green-light);
-  background: #fff;
-  box-shadow: 0 0 0 3px rgba(109,183,96,0.15);
+.auth-field:focus-within::after { width: 100%; }
+
+/* ── Error alert ──────────────────────────────── */
+.auth-error {
+  width: 100%;
+  background: rgba(255,235,235,0.85);
+  border-left: 3px solid #e57373;
+  color: #b71c1c;
+  font-size: 0.85rem;
+  padding: 0.6rem 0.9rem;
+  border-radius: 0 10px 10px 0;
+  margin-bottom: 1.2rem;
+  backdrop-filter: blur(4px);
 }
 
-/* ── Buttons ──────────────────────────────── */
-.btn-eco-primary {
-  display: block;
+/* ── Botón principal verde ────────────────────── */
+.btn-auth-primary {
   width: 100%;
-  padding: 0.85rem;
+  padding: 0.9rem;
   border: none;
   border-radius: 50px;
-  background: linear-gradient(135deg, var(--eco-green) 0%, var(--eco-green-light) 100%);
+  background: linear-gradient(135deg, var(--eco-green) 0%, var(--eco-green-mid) 100%);
   color: #fff;
-  font-family: 'Nunito', sans-serif;
-  font-size: 1rem;
+  font-family: 'Quicksand', sans-serif;
+  font-size: 1.05rem;
   font-weight: 700;
+  letter-spacing: 0.5px;
   cursor: pointer;
-  letter-spacing: 0.3px;
+  box-shadow: 0 6px 20px var(--eco-shadow-green);
   transition: transform 0.18s, box-shadow 0.18s, filter 0.18s;
-  box-shadow: 0 4px 16px rgba(74,140,63,0.35);
   margin-top: 0.5rem;
 }
-.btn-eco-primary:hover {
+.btn-auth-primary:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 22px rgba(74,140,63,0.45);
-  filter: brightness(1.06);
+  box-shadow: 0 10px 28px var(--eco-shadow-green);
+  filter: brightness(1.07);
 }
-.btn-eco-primary:active { transform: translateY(0); }
+.btn-auth-primary:active { transform: translateY(0); }
+.btn-auth-primary:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+  transform: none;
+}
 
-.btn-eco-secondary {
-  display: block;
+/* ── Botón lavanda (login secundario) ─────────── */
+.btn-auth-lavender {
   width: 100%;
-  padding: 0.82rem;
+  padding: 0.9rem;
   border: none;
   border-radius: 50px;
   background: linear-gradient(135deg, var(--eco-lavender) 0%, var(--eco-lavender-dark) 100%);
   color: #fff;
-  font-family: 'Nunito', sans-serif;
-  font-size: 1rem;
+  font-family: 'Quicksand', sans-serif;
+  font-size: 1.05rem;
   font-weight: 700;
+  letter-spacing: 0.5px;
   cursor: pointer;
+  box-shadow: 0 6px 20px rgba(126,87,194,0.28);
   transition: transform 0.18s, box-shadow 0.18s, filter 0.18s;
-  box-shadow: 0 4px 16px rgba(155,142,196,0.3);
-  text-decoration: none;
-  text-align: center;
   margin-top: 0.5rem;
 }
-.btn-eco-secondary:hover {
+.btn-auth-lavender:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 22px rgba(155,142,196,0.4);
-  filter: brightness(1.06);
-  color: #fff;
+  box-shadow: 0 10px 28px rgba(126,87,194,0.38);
+  filter: brightness(1.07);
 }
+.btn-auth-lavender:disabled { opacity: 0.65; cursor: not-allowed; transform: none; }
 
-/* ── Footer link ──────────────────────────── */
-.auth-footer-link {
+/* ── Spinner dentro del botón ─────────────────── */
+.btn-spinner {
+  display: inline-block;
+  width: 16px; height: 16px;
+  border: 2px solid rgba(255,255,255,0.4);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  vertical-align: middle;
+  margin-right: 0.5rem;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── Footer link ──────────────────────────────── */
+.auth-footer {
+  margin-top: 1.6rem;
   text-align: center;
-  margin-top: 1.4rem;
-  font-size: 0.88rem;
+  font-size: 0.9rem;
   color: var(--eco-text-soft);
 }
-.auth-footer-link a {
+.auth-footer a {
   color: var(--eco-green);
   font-weight: 700;
   text-decoration: none;
   transition: color 0.15s;
 }
-.auth-footer-link a:hover { color: var(--eco-green-light); }
+.auth-footer a:hover { color: var(--eco-green-mid); }
 
-/* ── Divider ──────────────────────────────── */
-.auth-divider {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  margin: 1.2rem 0;
-  color: var(--eco-text-soft);
-  font-size: 0.8rem;
-}
-.auth-divider::before,
-.auth-divider::after {
-  content: '';
-  flex: 1;
-  height: 1px;
-  background: #d8e8d4;
-}
-
-/* ── Welcome screen (landing) ─────────────── */
-.welcome-buttons { margin-top: 2rem; display: flex; flex-direction: column; gap: 0.8rem; }
-
-/* ── Responsive ───────────────────────────── */
-@media (max-width: 480px) {
-  .auth-card { padding: 2rem 1.4rem; border-radius: 22px; }
-  .auth-logo-title { font-size: 1.7rem; }
-}
-
-/* ── Bootstrap overrides / custom classes ───────────────────────────────────
-   Se usan junto a las clases Bootstrap (btn, form-control, form-floating…)
-   para mantener la paleta EcoMisión sin romper el comportamiento de BS.
-   ────────────────────────────────────────────────────────────────────────── */
-
-/* Botón principal verde — úsalo como: className="btn btn-eco w-100" */
+/* ── Bootstrap overrides (se mantiene compatibilidad) ── */
 .btn-eco {
-  background: linear-gradient(135deg, var(--eco-green) 0%, var(--eco-green-light) 100%);
+  background: linear-gradient(135deg, var(--eco-green) 0%, var(--eco-green-mid) 100%);
   color: #fff;
   border: none;
   border-radius: 50px;
-  font-family: 'Nunito', sans-serif;
+  font-family: 'Quicksand', sans-serif;
   font-weight: 700;
-  font-size: 1rem;
-  letter-spacing: 0.2px;
-  box-shadow: 0 4px 16px rgba(74,140,63,0.32);
+  box-shadow: 0 4px 16px var(--eco-shadow-green);
   transition: transform 0.18s, box-shadow 0.18s, filter 0.18s;
 }
 .btn-eco:hover, .btn-eco:focus {
   color: #fff;
   transform: translateY(-2px);
-  box-shadow: 0 6px 22px rgba(74,140,63,0.42);
+  box-shadow: 0 6px 22px var(--eco-shadow-green);
   filter: brightness(1.06);
 }
-.btn-eco:disabled {
-  background: #c5d9c0;
-  box-shadow: none;
-  transform: none;
-  filter: none;
-}
+.btn-eco:disabled { background: #c5d9c0; box-shadow: none; transform: none; filter: none; }
 
-/* Links verdes — úsalo como: className="eco-link" */
-.eco-link {
-  color: var(--eco-green);
-  text-decoration: none;
-  transition: color 0.15s;
-}
-.eco-link:hover { color: var(--eco-green-light); }
+.eco-link { color: var(--eco-green); text-decoration: none; font-weight: 700; transition: color 0.15s; }
+.eco-link:hover { color: var(--eco-green-mid); }
 
-/* form-control focus en verde */
 .form-control:focus {
-  border-color: var(--eco-green-light);
-  box-shadow: 0 0 0 0.2rem rgba(109,183,96,0.2);
+  border-color: var(--eco-green-mid);
+  box-shadow: 0 0 0 0.2rem rgba(90,158,95,0.2);
 }
-
-/* form-check-input tick en verde */
 .form-check-input:checked {
   background-color: var(--eco-green);
   border-color: var(--eco-green);
+}
+
+/* ── Welcome screen ───────────────────────────── */
+.welcome-buttons { margin-top: 1.5rem; display: flex; flex-direction: column; gap: 0.85rem; width: 100%; }
+
+/* ── Responsive ───────────────────────────────── */
+@media (max-width: 480px) {
+  .auth-card { padding: 0 1.2rem 2rem; }
+  .auth-logo-img { width: 90px; height: 90px; }
+  .auth-logo-title { font-size: 1.7rem; }
+  .auth-heading { font-size: 1.4rem; }
 }

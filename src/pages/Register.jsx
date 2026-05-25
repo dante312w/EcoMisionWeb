@@ -1,155 +1,125 @@
 // src/pages/Register.jsx
-// Crear cuenta con Bootstrap + EcoMisión + API real
-
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { registerUser } from '../service';
 import '../styles/auth.css';
 
+function Hills() {
+  return (
+    <div className="auth-hills">
+      <svg viewBox="0 0 1440 220" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none"
+        style={{ width: '100%', display: 'block' }}>
+        <path
+          d="M0,160 C180,80 360,200 540,140 C720,80 900,200 1080,140 C1260,80 1380,160 1440,130 L1440,220 L0,220 Z"
+          fill="rgba(140,195,120,0.25)"
+        />
+        <path
+          d="M0,185 C120,140 300,220 480,175 C660,130 840,210 1020,170 C1200,130 1350,185 1440,160 L1440,220 L0,220 Z"
+          fill="rgba(100,170,90,0.35)"
+        />
+        <path
+          d="M0,200 C200,165 400,220 600,195 C800,170 1000,215 1200,195 C1350,180 1420,205 1440,200 L1440,220 L0,220 Z"
+          fill="rgba(80,150,70,0.55)"
+        />
+      </svg>
+    </div>
+  );
+}
+
 export default function Register() {
   const navigate = useNavigate();
-
   const [form, setForm] = useState({
-    name: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
+    name: '', email: '', password: '', confirmPassword: '',
   });
-
-  const [error, setError] = useState('');
+  const [error,   setError]   = useState('');
   const [loading, setLoading] = useState(false);
-  const [exitoVisible, setExitoVisible] = useState(false);
 
-  /* ───── Handlers ───── */
   const handleChange = (e) =>
-    setForm((prev) => ({
-      ...prev,
-      [e.target.name]: e.target.value,
-    }));
+    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-
     const { name, email, password, confirmPassword } = form;
 
-    // Validaciones frontend (UX)
     if (!name || !email || !password || !confirmPassword) {
       setError('Por favor completa todos los campos.');
       return;
     }
-
-    if (!email.trim()) {
-      setError('El correo es obligatorio.');
-      return;
-    }
-
     if (password.length < 6) {
       setError('La contraseña debe tener al menos 6 caracteres.');
       return;
     }
-
     if (password !== confirmPassword) {
       setError('Las contraseñas no coinciden.');
       return;
     }
 
     setLoading(true);
-
     try {
-      // ✅ Llamada REAL al backend
       await registerUser({ name, email, password });
-
-      // ✅ Mostrar aviso de éxito
-      setExitoVisible(true);
-      
-      // Redirigir después de 2 segundos
-      setTimeout(() => {
-        navigate('/login');
-      }, 2000);
+      navigate('/login');
     } catch (err) {
-      // Mostrar error del backend
       setError(err.message || 'Error al registrar usuario');
     } finally {
       setLoading(false);
     }
   };
 
-  /* ───── Render ───── */
   return (
     <div className="auth-page">
-      <span className="leaf-deco leaf-deco-1">🌿</span>
-      <span className="leaf-deco leaf-deco-2">🍃</span>
+      <span className="auth-leaf auth-leaf-1">🌿</span>
+      <span className="auth-leaf auth-leaf-2">🍃</span>
+      <span className="auth-leaf auth-leaf-3">🌿</span>
+      <span className="auth-leaf auth-leaf-4">🍃</span>
 
       <div className="auth-card">
         {/* Logo */}
-        <div className="text-center mb-4">
-          <div className="auth-logo-icon mx-auto mb-2">🌍</div>
+        <div className="auth-logo-wrap">
+          <img
+            src="/icono_principal.png"
+            alt="EcoMisión"
+            className="auth-logo-img"
+          />
           <h1 className="auth-logo-title">EcoMisión</h1>
-          <p className="text-muted small">
-            Únete a la misión por un planeta mejor
-          </p>
         </div>
 
-        {/* Éxito */}
-        {exitoVisible && (
-          <div
-            className="alert alert-success py-3 px-3 rounded-3 small text-center mb-3"
-            role="alert"
-          >
-            <div style={{ fontSize: '1.8rem', marginBottom: '0.5rem' }}></div>
-            <strong>¡Cuenta creada exitosamente!</strong><br />
-            <small>Redirigiendo al login...</small>
-          </div>
-        )}
+        <h2 className="auth-heading">Crear cuenta</h2>
+        <p className="auth-subheading">Únete a la misión por un planeta mejor 🌍</p>
 
-        {/* Error */}
-        {error && (
-          <div
-            className="alert alert-danger py-2 px-3 rounded-3 small"
-            role="alert"
-          >
-            {error}
-          </div>
-        )}
+        {error && <div className="auth-error">{error}</div>}
 
-        {/* Formulario */}
-        <form onSubmit={handleSubmit} noValidate>
-          <div className="form-floating mb-3">
+        <form onSubmit={handleSubmit} noValidate style={{ width: '100%' }}>
+          <div className="auth-field">
+            <span className="auth-field-icon">👤</span>
             <input
               type="text"
-              className="form-control"
-              id="floatingName"
               name="name"
-              placeholder="Tu nombre"
+              placeholder="Nombre"
               value={form.name}
               onChange={handleChange}
               autoComplete="name"
               required
             />
-            <label htmlFor="floatingName">👤 Nombre</label>
           </div>
 
-          <div className="form-floating mb-3">
+          <div className="auth-field">
+            <span className="auth-field-icon">✉️</span>
             <input
               type="email"
-              className="form-control"
-              id="floatingEmail"
               name="email"
-              placeholder="nombre@ejemplo.com"
+              placeholder="Correo electrónico"
               value={form.email}
               onChange={handleChange}
               autoComplete="email"
               required
             />
-            <label htmlFor="floatingEmail">✉️ Correo electrónico</label>
           </div>
 
-          <div className="form-floating mb-3">
+          <div className="auth-field">
+            <span className="auth-field-icon">🔒</span>
             <input
               type="password"
-              className="form-control"
-              id="floatingPassword"
               name="password"
               placeholder="Contraseña"
               value={form.password}
@@ -157,14 +127,12 @@ export default function Register() {
               autoComplete="new-password"
               required
             />
-            <label htmlFor="floatingPassword">🔒 Contraseña</label>
           </div>
 
-          <div className="form-floating mb-4">
+          <div className="auth-field">
+            <span className="auth-field-icon">🔑</span>
             <input
               type="password"
-              className="form-control"
-              id="floatingConfirm"
               name="confirmPassword"
               placeholder="Confirmar contraseña"
               value={form.confirmPassword}
@@ -172,38 +140,21 @@ export default function Register() {
               autoComplete="new-password"
               required
             />
-            <label htmlFor="floatingConfirm">🔑 Confirmar contraseña</label>
           </div>
 
-          <button
-            className="btn btn-eco w-100 py-2"
-            type="submit"
-            disabled={loading}
-          >
-            {loading ? (
-              <>
-                <span
-                  className="spinner-border spinner-border-sm me-2"
-                  role="status"
-                  aria-hidden="true"
-                />
-                Creando cuenta…
-              </>
-            ) : (
-              'Registrarse 🌱'
-            )}
+          <button className="btn-auth-primary" type="submit" disabled={loading}>
+            {loading && <span className="btn-spinner" />}
+            {loading ? 'Creando cuenta…' : 'Registrarse'}
           </button>
         </form>
 
-        <hr className="my-3" />
-
-        <p className="text-center small text-muted mb-0">
+        <p className="auth-footer">
           ¿Ya tienes cuenta?{' '}
-          <Link to="/login" className="eco-link fw-bold">
-            Iniciar sesión
-          </Link>
+          <Link to="/login">Iniciar sesión</Link>
         </p>
       </div>
+
+      <Hills />
     </div>
   );
 }
