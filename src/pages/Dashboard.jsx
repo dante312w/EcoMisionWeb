@@ -148,14 +148,30 @@ export default function Dashboard() {
   const userId    = localStorage.getItem('eco_userId');
   const email     = localStorage.getItem('eco_userEmail') ?? 'eco@usuario.com';
   const nombre    = localStorage.getItem('eco_userName')  ?? email.split('@')[0];
-  const huellaRaw = parseFloat(localStorage.getItem('eco_huella') ?? '0');
+  const huellaKg  = parseFloat(localStorage.getItem('eco_huella') ?? '0');
+  const huellaRaw = huellaKg / 1000; // Convertir kg a toneladas
 
-  const nivelHuella = huellaRaw < 5 ? 'bajo' : huellaRaw < 12 ? 'medio' : 'alto';
-  const nivelMeta = {
-    bajo:  { label: 'Huella baja 🌿',  color: 'success', pct: 30 },
-    medio: { label: 'Huella media 🌤', color: 'warning', pct: 60 },
-    alto:  { label: 'Huella alta 🔥',  color: 'danger',  pct: 90 },
-  }[nivelHuella];
+let nivelMeta = {
+  label: 'Huella baja 🌿',
+  color: 'success',
+  pct: 30,
+};
+
+if (huellaKg >= 3000 && huellaKg < 7000) {
+  nivelMeta = {
+    label: 'Huella media 🌤',
+    color: 'warning',
+    pct: 60,
+  };
+}
+
+if (huellaKg >= 7000) {
+  nivelMeta = {
+    label: 'Huella alta 🔥',
+    color: 'danger',
+    pct: 90,
+  };
+}
 
   const [retosPendientes,  setRetosPendientes]  = useState([]);
   const [retosCompletados, setRetosCompletados] = useState([]);
@@ -172,6 +188,16 @@ useEffect(() => {
 
   const cargar = async () => {
     try {
+      // ✅ PRIMER PASO: Verificar si el usuario ya respondió el quiz
+      const userDataResponse = await fetch(`${import.meta.env.VITE_API_URL}/user/${userId}`);
+      const userData = await userDataResponse.json();
+      
+      if (!userData?.user?.first_quiz_completed) {
+        // Si no ha respondido el quiz, redirigir al cuestionario
+        navigate('/cuestionario');
+        return;
+      }
+
       const [respuestaDiaria, activos, historial] = await Promise.all([
         // getRetosDelDia devuelve { challenge, message }
         fetch(`${import.meta.env.VITE_API_URL}/challenge/daily/${userId}`)
@@ -221,7 +247,25 @@ useEffect(() => {
     const reto = retosPendientes.find((r) => r.id === id);
     try {
       await completarReto(userId, reto._raw);
-      const nuevos = puntosTotales + (reto?.puntos ?? 0);
+
+          /* ── ACTUALIZAR HUELLA ───────────────── */
+          const huellaActual = parseFloat(
+            localStorage.getItem('eco_huella') ?? '0'
+          );
+
+          // usar el impacto REAL del reto
+          const reduccionCO2 = parseFloat(reto.huella_kg ?? 0);
+
+          // sumar reducción acumulada
+          const nuevaHuella = huellaActual + reduccionCO2;
+
+          localStorage.setItem(
+            'eco_huella',
+            nuevaHuella.toString()
+          );
+
+          /* ── PUNTOS ─────────────────────────── */
+          const nuevos = puntosTotales + (reto?.puntos ?? 0);
       setPuntosTotales(nuevos);
       localStorage.setItem('eco_puntos', nuevos);
       setRetosPendientes(prev => prev.filter(r => r.id !== id));
@@ -288,16 +332,26 @@ useEffect(() => {
             <div className="card-body">
               <div className="d-flex align-items-center justify-content-between mb-2">
                 <span className="dash-section-label">Tu huella de carbono</span>
-                <span className={`badge bg-${nivelMeta.color} bg-opacity-15 text-${nivelMeta.color} border border-${nivelMeta.color} border-opacity-25`}>
-                  {nivelMeta.label}
-                </span>
+                <span
+                    className={`badge border border-${nivelMeta.color} border-opacity-25`}
+                    style={{
+                      backgroundColor: 'rgba(25,135,84,.12)',
+                      color: '#198754',
+                      fontWeight: '600',
+                      padding: '0.55rem 0.9rem',
+                      fontSize: '0.78rem',
+                      borderRadius: '999px',
+                    }}
+                  >
+                    {nivelMeta.label}
+                  </span>
               </div>
-              <h3 className="dash-huella-num">{huellaRaw} <small>ton CO₂/año</small></h3>
+              <h3 className="dash-huella-num">{huellaRaw.toFixed(2)} <small>ton CO₂/año</small></h3>
               <div className="progress mt-2" style={{ height: '8px' }}>
                 <div
                   className={`progress-bar bg-${nivelMeta.color}`}
                   role="progressbar"
-                  style={{ width: `${nivelMeta.pct}%` }}
+                  style={{ width: `${Math.min((huellaKg / 12000) * 100, 100)}%` }}
                   aria-valuenow={nivelMeta.pct}
                   aria-valuemin="0"
                   aria-valuemax="100"
@@ -305,7 +359,7 @@ useEffect(() => {
               </div>
               <div className="d-flex justify-content-between mt-1">
                 <small className="text-muted">0 ton</small>
-                <small className="text-muted">20 ton</small>
+                <small className="text-muted">12 ton</small>
               </div>
             </div>
           </div>

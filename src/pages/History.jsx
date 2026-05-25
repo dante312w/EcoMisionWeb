@@ -13,10 +13,24 @@ const CATEGORY_ICON = {
 };
 
 function formatFecha(dateStr) {
-  const d = new Date(dateStr);
-  return d.toLocaleDateString('es-CO', { day: '2-digit', month: 'short', year: 'numeric' });
-}
 
+  if (!dateStr) return 'Sin fecha';
+
+  const d = new Date(dateStr);
+
+  if (isNaN(d.getTime())) {
+    return 'Sin fecha';
+  }
+
+  return d.toLocaleDateString(
+    'es-CO',
+    {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric'
+    }
+  );
+}
 export default function History() {
   const userId = localStorage.getItem('eco_userId');
 
@@ -30,9 +44,27 @@ export default function History() {
       try {
         const data = await getHistorialUsuario(userId);
         // Más reciente primero
-        const ordenado = [...data].sort(
-          (a, b) => new Date(b.completed_at) - new Date(a.completed_at)
-        );
+        const historialValido = (Array.isArray(data) ? data : []).filter((h) => {
+
+        // Debe tener fecha válida
+        const fechaValida =
+          h.completed_at &&
+          !isNaN(new Date(h.completed_at).getTime());
+
+        // Debe tener algún dato del reto
+        const tieneReto =
+          h.challenge_snapshot?.title ||
+          h.challenge_snapshot?.category;
+
+        return fechaValida && tieneReto;
+
+      });
+
+      const ordenado = historialValido.sort(
+        (a, b) =>
+          new Date(b.completed_at) -
+          new Date(a.completed_at)
+      );
         setHistorial(ordenado);
       } catch {
         setError('No se pudo cargar el historial.');

@@ -18,6 +18,7 @@ export default function Register() {
 
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [exitoVisible, setExitoVisible] = useState(false);
 
   /* ───── Handlers ───── */
   const handleChange = (e) =>
@@ -59,8 +60,13 @@ export default function Register() {
       // ✅ Llamada REAL al backend
       await registerUser({ name, email, password });
 
-      // Si todo sale bien, ir al login
-      navigate('/login');
+      // ✅ Mostrar aviso de éxito
+      setExitoVisible(true);
+      
+      // Redirigir después de 2 segundos
+      setTimeout(() => {
+        navigate('/login');
+      }, 2000);
     } catch (err) {
       // Mostrar error del backend
       setError(err.message || 'Error al registrar usuario');
@@ -84,6 +90,18 @@ export default function Register() {
             Únete a la misión por un planeta mejor
           </p>
         </div>
+
+        {/* Éxito */}
+        {exitoVisible && (
+          <div
+            className="alert alert-success py-3 px-3 rounded-3 small text-center mb-3"
+            role="alert"
+          >
+            <div style={{ fontSize: '1.8rem', marginBottom: '0.5rem' }}></div>
+            <strong>¡Cuenta creada exitosamente!</strong><br />
+            <small>Redirigiendo al login...</small>
+          </div>
+        )}
 
         {/* Error */}
         {error && (

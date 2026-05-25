@@ -55,18 +55,18 @@ export default function Cuestionario() {
       const huellaKg = calcularHuella(respuestas);
       const userId = localStorage.getItem('eco_userId') || 'guest';
 
-      // Guarda en backend (TODO: asegúrate que el endpoint esté activo)
+      // Guarda en backend
       await guardarHuella(userId, respuestas, huellaKg);
 
       // Guarda localmente como respaldo
-      localStorage.setItem('eco_huella', huellaKg);
+      localStorage.setItem('eco_huella', String(huellaKg));
 
       navigate('/dashboard');
     } catch (err) {
       console.error(err);
       // Si el backend falla, guarda local y sigue de todas formas
       const huellaKg = calcularHuella(respuestas);
-      localStorage.setItem('eco_huella', huellaKg);
+      localStorage.setItem('eco_huella', String(huellaKg));
       navigate('/dashboard');
     } finally {
       setEnviando(false);
