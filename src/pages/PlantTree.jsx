@@ -6,6 +6,16 @@ import { Link } from 'react-router-dom';
 import '../styles/dashboard.css';
 import TreeMapLeaflet from '../components/TreeMapLeaflet';
 
+// Helper para decodificar JWT
+function decodeJwt(token) {
+  try {
+    const payload = token.split('.')[1];
+    return JSON.parse(atob(payload));
+  } catch {
+    return null;
+  }
+}
+
 
 const ARBOLES = [
   { id: 'roble',    nombre: 'Roble',    icon: '🌳', co2_anual: 21, tiempo: '5-10 años', descripcion: 'Árbol longevo que absorbe hasta 21 kg de CO₂/año en su madurez.' },
@@ -113,7 +123,23 @@ export default function PlantTree() {
   /* ── Plantar (usar request directo a /history) ────────────────────────── */
   const handlePlantar = async () => {
     const userId = localStorage.getItem('eco_userId');
-    const username = localStorage.getItem('eco_username') || 'Usuario';
+    let username = localStorage.getItem('eco_userName');
+    
+    // Si el nombre está vacío, intentar obtenerlo del servidor
+    if (!username || username.trim() === '') {
+      try {
+        const userData = await request(`/user/${userId}`);
+        username = userData?.user?.name || '';
+      } catch (err) {
+        console.log('No se pudo obtener nombre del servidor:', err);
+      }
+    }
+    
+    // Si aún sigue vacío, no usar fallback, solo guardar lo que tenemos
+    if (!username || username.trim() === '') {
+      username = 'Usuario';
+    }
+    
     if (!userId) {
       setPlantError('No se encontró tu sesión.');
       return;
